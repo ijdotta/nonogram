@@ -1,6 +1,7 @@
 :- module(proylcc,
 	[  
-		put/8
+		put/8,
+		contarPintadas/2 %Solo para testing, remover en la versión final.
 	]).
 
 :-use_module(library(lists)).
@@ -39,3 +40,48 @@ put(Contenido, [RowN, ColN], _PistasFilas, _PistasColumnas, Grilla, NewGrilla, 0
 	Cell == Contenido 
 		;
 	replace(_Cell, ColN, Contenido, Row, NewRow)).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% contarPintadas(+GrillaActual, -CantidadPintadas)
+%
+% Observación: recordar que el formato de consulta de la grilla es con las 'X' y los '#' entre comillas dobles
+%				y los espacios vacíos se representan como variables anónimas (i.e. SIN COMILLAS).
+% esto es solo para testing, dado que el cliente del servidor convierte automáticamente al formato de consulta.
+
+% ejemplo: contarPintadas([["#","#","#"], ["X", _, _], [_, _, "#"]]).
+
+contarPintadas([], 0).
+
+contarPintadas([R | Rs], CantPintadas) :-
+	contarPintadasFila(R, CantPintadasFila),
+	contarPintadas(Rs, CantPintadasSubGrid),
+	CantPintadas is CantPintadasFila + CantPintadasSubGrid.
+
+contarPintadasFila([], 0).
+
+contarPintadasFila([C | Cs], CantPintadasFila) :-
+	nonvar(C),
+	C = "#",
+	contarPintadasFila(Cs, CantPintadasSubFila),
+	CantPintadasFila is CantPintadasSubFila + 1.
+
+contarPintadasFila([_C | Cs], CantPintadasFila) :-
+	contarPintadasFila(Cs, CantPintadasSubFila),
+	CantPintadasFila is CantPintadasSubFila.
+
+% Con lo que está arriba se pueden pedir múltiples soluciones con ";" pero SOLO ES VÁLIDA LA PRIMERA.
+% Si se usan los predicados de abajo, solo calcula UNA solución válida.
+
+/*	
+contarPintadasFila([C | Cs], CantPintadasFila) :-
+	C \= "#",
+	contarPintadasFila(Cs, CantPintadasSubFila),
+	CantPintadasFila is CantPintadasSubFila.
+
+contarPintadasFila([C | Cs], CantPintadasFila) :-
+	var(C),
+	contarPintadasFila(Cs, CantPintadasSubFila),
+	CantPintadasFila is CantPintadasSubFila.
+*/
