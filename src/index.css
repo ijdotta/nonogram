@@ -18,6 +18,10 @@ body {
   outline: none;
 }
 
+.square:hover {
+  background: #999;
+}
+
 .board {
   display: grid;
 }
