@@ -68,3 +68,14 @@ body {
 .gameInfo {
   margin-left: 20px;
 }
+
+.modeBox {
+  background: #fff;
+  border: 1px solid #999;
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+}

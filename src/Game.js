@@ -1,7 +1,7 @@
 import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
-import ModeBox from './ModeBox';
+import ModeSelector from './ModeSelector';
 
 class Game extends React.Component {
 
@@ -95,7 +95,7 @@ class Game extends React.Component {
           </div>
 
           <div className="modoSelect">
-            <ModeBox  
+            <ModeSelector  
               grid = {[['X','#']]}
               onCruzClick={() => this.cruzHC()}
               onNumeralClick={() => this.numeralHC()}
