@@ -91,12 +91,12 @@ contarPintadas([R | Rs], CantPintadas) :-
 contarPintadasFila([], 0).
 
 contarPintadasFila([C | Cs], CantPintadasFila) :-
-	nonvar(C),
-	C = "#",
+	C == "#",
 	contarPintadasFila(Cs, CantPintadasSubFila),
 	CantPintadasFila is CantPintadasSubFila + 1.
 
-contarPintadasFila([_C | Cs], CantPintadasFila) :-
+contarPintadasFila([C | Cs], CantPintadasFila) :-
+	C \== "#",
 	contarPintadasFila(Cs, CantPintadasSubFila),
 	CantPintadasFila is CantPintadasSubFila.
 
