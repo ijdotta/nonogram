@@ -2,6 +2,7 @@ import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
 import ModeSelector from './ModeSelector';
+import ModeSwitch from './ModeSwitcher';
 
 class Game extends React.Component {
 
@@ -69,6 +70,15 @@ class Game extends React.Component {
     this.setState({mode: "X"});
   }
 
+  switchMode() {
+    if (this.props.mode === "#") {
+      this.setState({mode: "X"});
+    }
+    else {
+      this.setState({mode: "#"});
+    }
+  }
+
   render() {
     if (this.state.grid === null) {
       return null;
@@ -102,6 +112,13 @@ class Game extends React.Component {
               onClick={(i, j) => this.mBhandleClick(i,j)}
             />
           </div>
+
+          <div className="modeSwitcher">
+            <ModeSwitch
+              onClick={() => this.switchMode()}
+            />
+          </div>
+
         </p>
       </div>
     );
