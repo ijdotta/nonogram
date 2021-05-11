@@ -2,7 +2,6 @@ import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
 import ModeSelector from './ModeSelector';
-import ModeSwitch from './ModeSwitcher';
 
 class Game extends React.Component {
 
@@ -57,7 +56,7 @@ class Game extends React.Component {
         this.setState({          
           waiting: false
         });
-      } else { // Si todabia no se gano el juego
+      } else { // Si todavia no se gano el juego
 
         // Build Prolog query to make the move, which will look as follows:
         // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
@@ -134,9 +133,10 @@ class Game extends React.Component {
     }
     const statusText = 'Keep playing!';
     const modeText = 'Mode';
+
     return (
       
-      <div className="game">
+      <div className="game center">
         <p>
           <Board
             grid={this.state.grid}
@@ -156,15 +156,10 @@ class Game extends React.Component {
           <div className="modoSelect">
             <ModeSelector  
               grid = {[['X','#']]}
+              mode = {this.state.mode}
               onCruzClick={() => this.cruzHC()}
               onNumeralClick={() => this.numeralHC()}
               onClick={(i, j) => this.mBhandleClick(i,j)}
-            />
-          </div>
-
-          <div className="modeSwitcher">
-            <ModeSwitch
-              onClick={() => this.switchMode()}
             />
           </div>
 

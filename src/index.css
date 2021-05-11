@@ -3,6 +3,13 @@ body {
   margin: 20px;
 }
 
+.center {
+  margin: auto;
+  width: 50%;
+  border: 3px solid green;
+  padding: 10px;
+}
+
 .square {
   background: #fff;
   border: 1px solid #999;
@@ -69,7 +76,18 @@ body {
   margin-left: 20px;
 }
 
+.modeSelector {
+  display: flex;
+  flex-direction: row;
+}
+
 .modeBox {
+  font-size: 100px;
+  padding: 10px;
+  margin: 10px;
+}
+
+.modeBoxDiv {
   background: #fff;
   border: 1px solid #999;
   font-size: 24px;
@@ -79,6 +97,15 @@ body {
   padding: 0;
   text-align: center;
 }
+
+.selected {
+  background: darkred;
+}
+
+
+
+
+
 
 
 /* The switch - the box around the slider */
