@@ -40,26 +40,75 @@ class Game extends React.Component {
     if (this.state.waiting) {
       return;
     }
-    // Build Prolog query to make the move, which will look as follows:
-    // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
-    const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + ']' 
-    + ', [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
+    const cClues = JSON.stringify(this.state.rowClues);
+    const rClues = JSON.stringify(this.state.rowClues);
+
+    const queryCheckTodo = 'check_todo('+rClues+','+ cClues +','+ squaresS + ')';
     this.setState({
       waiting: true
     });
-    this.pengine.query(queryS, (success, response) => {
+    // Preguntar si se gano el juego
+    this.pengine.query(queryCheckTodo, (success, response) => {
+      console.log("Juego completado?: "+success);
       if (success) {
-        this.setState({
-          grid: response['GrillaRes'],
+        // Hacer cambios para juego ganado       
+      
+        this.setState({          
           waiting: false
         });
-      } else {
-        this.setState({
+      } else { // Si todabia no se gano el juego
+
+        // Build Prolog query to make the move, which will look as follows:
+        // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
+
+        const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + ']' + ', [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
+
+        this.pengine.query(queryS, (success, response) => { // Put
+          if (success) {
+            this.setState({ // Por ahora seteo la nueva grilla
+              grid: response['GrillaRes'],
+              waiting: false
+            });
+            
+            const nGrilla = JSON.stringify(response['GrillaRes']).replaceAll('"_"', "_"); // Nueva grilla en string.
+            // Check de las pistas en la fila y columna del Square clickeado.
+            const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ')';
+            const queryCheckColumna = 'check_pistas_columna('+j+','+ cClues +','+ nGrilla + ')';
+
+            this.pengine.query(queryCheckFila, (success, response) => { // Check fila
+              if (success) {
+                // Pintar la pista de la fila correspondiente 
+                console.log("fila "+i+": cumple");                
+              } else {
+                // Despintar la pista de la fila correspondiente                
+              }
+            });            
+
+            this.pengine.query(queryCheckColumna, (success, response) => { // Check columna
+              if (success) {
+                // Pintar la pista de la columna correspondiente
+                console.log("columna "+j+": cumple");                 
+              } else {
+                // Despintar la pista de la columna correspondiente                
+              }
+            }); 
+             
+
+
+            this.setState({
+              waiting: false
+            });
+          }
+        });
+
+        this.setState({          
           waiting: false
         });
+        
       }
     });
+    
   }
 
   numeralHC(){

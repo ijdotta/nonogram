@@ -91,12 +91,12 @@ contarPintadas([R | Rs], CantPintadas) :-
 contarPintadasFila([], 0).
 
 contarPintadasFila([C | Cs], CantPintadasFila) :-
-	nonvar(C),
-	C = "#",
+	C == "#",
 	contarPintadasFila(Cs, CantPintadasSubFila),
 	CantPintadasFila is CantPintadasSubFila + 1.
 
-contarPintadasFila([_C | Cs], CantPintadasFila) :-
+contarPintadasFila([C | Cs], CantPintadasFila) :-
+	C \== "#",
 	contarPintadasFila(Cs, CantPintadasSubFila),
 	CantPintadasFila is CantPintadasSubFila.
 
@@ -115,3 +115,86 @@ contarPintadasFila([C | Cs], CantPintadasFila) :-
 	CantPintadasFila is CantPintadasSubFila.
 */
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% predicado()
+%
+check_pistas_columna(Nro_col, PistasCol, Grilla):-
+    obtener_columna(Nro_col, Grilla, Columna),
+    obtener_pistas(Nro_col, PistasCol, Pistas),
+    check_pistas(Pistas, Columna).
+
+check_pistas_fila(Nro_fil, PistasFil, Grilla):-
+    obtener_fila(Nro_fil, Grilla, Fila),
+    obtener_pistas(Nro_fil, PistasFil, Pistas),
+    check_pistas(Pistas, Fila).
+
+% Indica si la grilla respeta todas las pistas
+check_todo(PistasFil, PistasCol, Grilla):-
+    contar_filas(Grilla, Cant_fil),
+    Cant_fil_aux is Cant_fil - 1,
+    check_todas_filas(Cant_fil_aux, PistasFil, Grilla),
+    contar_columnas(Grilla, Cant_col),
+    Cant_col_aux is Cant_col - 1,
+    check_todas_columnas(Cant_col_aux, PistasCol, Grilla).
+    
+obtener_columna(_Nro_col, [], []).
+obtener_columna(Nro_col, [H|Grillita], [E|Columnita]):-
+    buscar_pos(Nro_col,H,E),
+    obtener_columna(Nro_col, Grillita, Columnita).
+
+obtener_fila(Nro_fil, Grilla, Fila):- buscar_pos(Nro_fil, Grilla, Fila).
+
+obtener_pistas(Pos, PistasCol, Pistas):- buscar_pos(Pos, PistasCol, Pistas).
+
+buscar_pos(0,[H|_T],H).
+buscar_pos(Pos, [_H|T], E):-
+    PosAux is Pos - 1,
+    buscar_pos(PosAux,T, E).
+
+
+check_pistas([H1|Pistitas],[H2|Listita]):- %Si encuentro celda pintada, asegurarme que respete la secuencia de las pistas.
+    H2 == "#",    
+    check_pistas_secuencia([H1|Pistitas], [H2|Listita]).
+check_pistas([H1|Pistitas],[H2|Listita]):- %Si encuentro celda no pintada, avanzo en la lista.
+    H2 \== "#",
+    check_pistas([H1|Pistitas], Listita).
+
+% Se asegura que haya una secuencia pintada como indica la pista
+check_pistas_secuencia([0],[]). %Si recorri toda la lista y no hay mas pistas, devuelvo true.
+check_pistas_secuencia([0],Listita):- check_pistas_aux(Listita). % Cuando agoto todas las pistas, me fijo que no queden celdas pintadas en el resto de la lista.
+check_pistas_secuencia([0|Pistitas],[H|Listita]):- %Cuando agoto una pista, avanzo a siguiente pista, me fijo que no haya una celda pintada.
+    H \== "#",
+    check_pistas(Pistitas,Listita).
+check_pistas_secuencia([H1|Pistitas], [H2|Listita]):-
+    H2 == "#",
+    H1_aux is H1 -1,
+    check_pistas_secuencia([H1_aux|Pistitas], Listita).
+
+% Devuelve false si encuentra una celda pintada.
+check_pistas_aux([]).
+check_pistas_aux([H|Listita]):-
+    H \== "#",
+    check_pistas_aux(Listita).
+
+contar_filas(Grilla, Cant_col):- contar_elementos(Grilla, Cant_col).
+    
+contar_columnas([H|_Grillita], Cant_fil):- contar_elementos(H, Cant_fil).
+
+
+contar_elementos([],0).
+contar_elementos([_H|T], Cant_elem):-
+    contar_elementos(T, Cant_elem_aux),
+    Cant_elem is Cant_elem_aux + 1.
+
+check_todas_columnas(-1, _PistasCol, _Grilla).
+check_todas_columnas(Nro_col, PistasCol, Grilla):-
+    check_pistas_columna(Nro_col, PistasCol, Grilla),
+    Nro_col_aux is Nro_col -1,
+    check_todas_columnas(Nro_col_aux, PistasCol, Grilla).
+
+check_todas_filas(-1, _PistasFil, _Grilla).
+check_todas_filas(Nro_fil, PistasFil, Grilla):-
+    check_pistas_fila(Nro_fil, PistasFil, Grilla),
+    Nro_fil_aux is Nro_fil -1,
+    check_todas_filas(Nro_fil_aux, PistasFil, Grilla).
