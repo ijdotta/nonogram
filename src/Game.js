@@ -79,37 +79,22 @@ class Game extends React.Component {
             const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ')';
             const queryCheckColumna = 'check_pistas_columna('+j+','+ cClues +','+ nGrilla + ')';
 
-            this.pengine.query(queryCheckFila, (success, response) => { // Check fila
-              
+            // Check fila
+            this.pengine.query(queryCheckFila, (success, response) => { 
               const newCheckedRowClues = this.state.checkedRowClues.slice();
-
-              if (success) {
-                newCheckedRowClues[i] = true;
-                console.log("fila "+i+": cumple");                
-              } else {
-                // Despintar la pista de la fila correspondiente    
-                newCheckedRowClues[i] = false;            
-              }
-
+              newCheckedRowClues[i] = success;
               this.setState({checkedRowClues: newCheckedRowClues});
 
               console.log("Checked rows: " + this.state.checkedRowClues);
             });            
 
-            this.pengine.query(queryCheckColumna, (success, response) => { // Check columna
-
+            // Check columna
+            this.pengine.query(queryCheckColumna, (success, response) => {
               const newCheckedColClues = this.state.checkedColClues.slice();
-
-              if (success) {
-                // Pintar la pista de la columna correspondiente
-                newCheckedColClues[j] = true;
-                console.log("columna "+j+": cumple");                 
-              } else {
-                // Despintar la pista de la columna correspondiente   
-                newCheckedColClues[j] = false;
-              }
-
+              newCheckedColClues[j] = success;
               this.setState({checkedColClues: newCheckedColClues});
+
+              console.log("Checked cols: " + this.state.checkedColClues);
             });          
 
 
