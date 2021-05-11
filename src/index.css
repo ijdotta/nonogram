@@ -59,6 +59,10 @@ body {
   margin: 5px;
 }
 
+.checked {
+  background: greenyellow;
+}
+
 .clue div {
   margin: 2px
 }

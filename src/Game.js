@@ -14,6 +14,8 @@ class Game extends React.Component {
       grid: null,
       rowClues: null,
       colClues: null,
+      checkedRowClues: null,
+      checkedColClues: null,
       waiting: false
     };
     this.handleClick = this.handleClick.bind(this);
@@ -29,6 +31,8 @@ class Game extends React.Component {
           grid: response['Grilla'],
           rowClues: response['PistasFilas'],
           colClues: response['PistasColumns'],
+          checkedRowClues: Array(response['PistasFilas'].length).fill(false),
+          checkedColClues: Array(response['PistasColumns'].length).fill(false)
         });
       }
     });
@@ -76,23 +80,37 @@ class Game extends React.Component {
             const queryCheckColumna = 'check_pistas_columna('+j+','+ cClues +','+ nGrilla + ')';
 
             this.pengine.query(queryCheckFila, (success, response) => { // Check fila
+              
+              const newCheckedRowClues = this.state.checkedRowClues.slice();
+
               if (success) {
-                // Pintar la pista de la fila correspondiente 
+                newCheckedRowClues[i] = true;
                 console.log("fila "+i+": cumple");                
               } else {
-                // Despintar la pista de la fila correspondiente                
+                // Despintar la pista de la fila correspondiente    
+                newCheckedRowClues[i] = false;            
               }
+
+              this.setState({checkedRowClues: newCheckedRowClues});
+
+              console.log("Checked rows: " + this.state.checkedRowClues);
             });            
 
             this.pengine.query(queryCheckColumna, (success, response) => { // Check columna
+
+              const newCheckedColClues = this.state.checkedColClues.slice();
+
               if (success) {
                 // Pintar la pista de la columna correspondiente
+                newCheckedColClues[j] = true;
                 console.log("columna "+j+": cumple");                 
               } else {
-                // Despintar la pista de la columna correspondiente                
+                // Despintar la pista de la columna correspondiente   
+                newCheckedColClues[j] = false;
               }
-            }); 
-             
+
+              this.setState({checkedColClues: newCheckedColClues});
+            });          
 
 
             this.setState({
@@ -106,8 +124,8 @@ class Game extends React.Component {
         });
         
       }
+
     });
-    
   }
 
   numeralHC(){
@@ -142,6 +160,8 @@ class Game extends React.Component {
             grid={this.state.grid}
             rowClues={this.state.rowClues}
             colClues={this.state.colClues}
+            checkedRowClues={this.state.checkedRowClues}
+            checkedColClues={this.state.checkedColClues}
             onClick={(i, j) => this.handleClick(i,j)}
           />
           
