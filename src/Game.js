@@ -1,7 +1,7 @@
 import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
-import ModeBox from './ModeBox';
+import ModeSelector from './ModeSelector';
 
 class Game extends React.Component {
 
@@ -14,6 +14,8 @@ class Game extends React.Component {
       grid: null,
       rowClues: null,
       colClues: null,
+      checkedRowClues: null,
+      checkedColClues: null,
       waiting: false
     };
     this.handleClick = this.handleClick.bind(this);
@@ -29,6 +31,8 @@ class Game extends React.Component {
           grid: response['Grilla'],
           rowClues: response['PistasFilas'],
           colClues: response['PistasColumns'],
+          checkedRowClues: Array(response['PistasFilas'].length).fill(false),
+          checkedColClues: Array(response['PistasColumns'].length).fill(false)
         });
       }
     });
@@ -56,7 +60,7 @@ class Game extends React.Component {
         this.setState({          
           waiting: false
         });
-      } else { // Si todabia no se gano el juego
+      } else { // Si todavia no se gano el juego
 
         // Build Prolog query to make the move, which will look as follows:
         // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
@@ -75,24 +79,23 @@ class Game extends React.Component {
             const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ')';
             const queryCheckColumna = 'check_pistas_columna('+j+','+ cClues +','+ nGrilla + ')';
 
-            this.pengine.query(queryCheckFila, (success, response) => { // Check fila
-              if (success) {
-                // Pintar la pista de la fila correspondiente 
-                console.log("fila "+i+": cumple");                
-              } else {
-                // Despintar la pista de la fila correspondiente                
-              }
+            // Check fila
+            this.pengine.query(queryCheckFila, (success, response) => { 
+              const newCheckedRowClues = this.state.checkedRowClues.slice();
+              newCheckedRowClues[i] = success;
+              this.setState({checkedRowClues: newCheckedRowClues});
+
+              console.log("Checked rows: " + this.state.checkedRowClues);
             });            
 
-            this.pengine.query(queryCheckColumna, (success, response) => { // Check columna
-              if (success) {
-                // Pintar la pista de la columna correspondiente
-                console.log("columna "+j+": cumple");                 
-              } else {
-                // Despintar la pista de la columna correspondiente                
-              }
-            }); 
-             
+            // Check columna
+            this.pengine.query(queryCheckColumna, (success, response) => {
+              const newCheckedColClues = this.state.checkedColClues.slice();
+              newCheckedColClues[j] = success;
+              this.setState({checkedColClues: newCheckedColClues});
+
+              console.log("Checked cols: " + this.state.checkedColClues);
+            });          
 
 
             this.setState({
@@ -106,8 +109,8 @@ class Game extends React.Component {
         });
         
       }
+
     });
-    
   }
 
   numeralHC(){
@@ -118,20 +121,32 @@ class Game extends React.Component {
     this.setState({mode: "X"});
   }
 
+  switchMode() {
+    if (this.props.mode === "#") {
+      this.setState({mode: "X"});
+    }
+    else {
+      this.setState({mode: "#"});
+    }
+  }
+
   render() {
     if (this.state.grid === null) {
       return null;
     }
     const statusText = 'Keep playing!';
     const modeText = 'Mode';
+
     return (
       
-      <div className="game">
+      <div className="game center">
         <p>
           <Board
             grid={this.state.grid}
             rowClues={this.state.rowClues}
             colClues={this.state.colClues}
+            checkedRowClues={this.state.checkedRowClues}
+            checkedColClues={this.state.checkedColClues}
             onClick={(i, j) => this.handleClick(i,j)}
           />
           
@@ -144,13 +159,15 @@ class Game extends React.Component {
           </div>
 
           <div className="modoSelect">
-            <ModeBox  
+            <ModeSelector  
               grid = {[['X','#']]}
+              mode = {this.state.mode}
               onCruzClick={() => this.cruzHC()}
               onNumeralClick={() => this.numeralHC()}
               onClick={(i, j) => this.mBhandleClick(i,j)}
             />
           </div>
+
         </p>
       </div>
     );
