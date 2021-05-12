@@ -4,13 +4,16 @@ class ModeBox extends React.Component {
     render() {
 
         const selected = this.props.selected;
+        const value = this.props.value;
         console.log("Selected: " + selected);
+
+        const type = value === "#"? "paint" : "cross";
 
         return (
         
-            <button className={"modeBox" + (selected? " selected" : "")}
+            <button className={"modeBox" + (selected? " selected" : "") + " " + type}
                 onClick={this.props.onClick}>
-                {this.props.value}
+                {value}
             </button>
         );
     }

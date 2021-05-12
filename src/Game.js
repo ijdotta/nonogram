@@ -165,7 +165,7 @@ class Game extends React.Component {
     return (
       
       <div className="game center">
-        <p>
+        
           <Board
             grid={this.state.grid}
             rowClues={this.state.rowClues}
@@ -174,18 +174,9 @@ class Game extends React.Component {
             checkedColClues={this.state.checkedColClues}
             onClick={(i, j) => this.handleClick(i,j)}
           />
-          
-          <div className="gameInfo">
-            {statusText}
-          </div>
-        
-          <div className="modeInfo">
-            {modeText}
-          </div>
 
-          <div className="modoSelect">
-            <ModeSelector  
-              grid = {[['X','#']]}
+          <div className="modeSelect">
+            <ModeSelector
               mode = {this.state.mode}
               onCruzClick={() => this.cruzHC()}
               onNumeralClick={() => this.numeralHC()}
@@ -193,7 +184,7 @@ class Game extends React.Component {
             />
           </div>
 
-        </p>
+        
       </div>
     );
   }

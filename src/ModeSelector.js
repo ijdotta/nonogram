@@ -3,14 +3,11 @@ import ModeBox from './ModeBox';
 
 class ModeSelector extends React.Component {
     render() {
-        const numOfRows = 1;
-        const numOfCols = 2;
-        console.log(this.props);
         console.log("Mode: " + this.props.mode);
         return (
             <div className="modeSelector">
 
-                <div>
+                <div className="leftBox">
                     <ModeBox
                         value={"X"}
                         selected={(this.props.mode === "X")}
@@ -19,7 +16,7 @@ class ModeSelector extends React.Component {
                     />
                 </div>
 
-                <div>
+                <div className="rightBox">
                     <ModeBox
                         value={"#"}
                         selected={(this.props.mode === "#")}
