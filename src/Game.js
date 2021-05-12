@@ -68,7 +68,7 @@ class Game extends React.Component {
         // Build Prolog query to make the move, which will look as follows:
         // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
 
-        const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + ']' + ', [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
+        const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + '], [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
 
         this.pengine.query(queryS, (success, response) => { // Put
           if (success) {
@@ -76,30 +76,9 @@ class Game extends React.Component {
               grid: response['GrillaRes'],
               waiting: false
             });
-            
-            const nGrilla = JSON.stringify(response['GrillaRes']).replaceAll('"_"', "_"); // Nueva grilla en string.
-            // Check de las pistas en la fila y columna del Square clickeado.
-            const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ')';
-            const queryCheckColumna = 'check_pistas_columna('+j+','+ cClues +','+ nGrilla + ')';
 
-            // Check fila
-            this.pengine.query(queryCheckFila, (success, response) => { 
-              const newCheckedRowClues = this.state.checkedRowClues.slice();
-              newCheckedRowClues[i] = success;
-              this.setState({checkedRowClues: newCheckedRowClues});
-
-              console.log("Checked rows: " + this.state.checkedRowClues);
-            });            
-
-            // Check columna
-            this.pengine.query(queryCheckColumna, (success, response) => {
-              const newCheckedColClues = this.state.checkedColClues.slice();
-              newCheckedColClues[j] = success;
-              this.setState({checkedColClues: newCheckedColClues});
-
-              console.log("Checked cols: " + this.state.checkedColClues);
-            });          
-
+            this.checkRow(i);
+            this.checkCol(j);
 
             this.setState({
               waiting: false
@@ -133,15 +112,20 @@ class Game extends React.Component {
     }
   }
 
+  /**
+   * Check inicial del grid: permite marcar como verificadas
+   * las pistas que ya son correctas desde el inicio.
+   */
   initialGridCheck() {
-    console.log("RowClues length: " + this.state.rowClues.length);
+
     for (var i = 0; i < this.state.rowClues.length; i++){
-      console.log("Checking row: " + i);
       this.checkRow(i);
     }
+
     for (var j = 0; j < this.state.colClues.length; j++){
       this.checkCol(j);
     }
+
   }
 
   checkRow(i) {
