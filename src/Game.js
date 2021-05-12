@@ -16,7 +16,8 @@ class Game extends React.Component {
       colClues: null,
       checkedRowClues: null,
       checkedColClues: null,
-      waiting: false
+      waiting: false,
+      endGame: false
     };
     this.handleClick = this.handleClick.bind(this);
     this.handlePengineCreate = this.handlePengineCreate.bind(this);
@@ -42,56 +43,33 @@ class Game extends React.Component {
   }
 
   handleClick(i, j) {
-    // No action on click if we are waiting.
+
     if (this.state.waiting) {
       return;
     }
+
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
-    const cClues = JSON.stringify(this.state.rowClues);
-    const rClues = JSON.stringify(this.state.rowClues);
+    const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + '], [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
 
-    const queryCheckTodo = 'check_todo('+rClues+','+ cClues +','+ squaresS + ')';
-    this.setState({
-      waiting: true
-    });
-    // Preguntar si se gano el juego
-    this.pengine.query(queryCheckTodo, (success, response) => {
-      console.log("Juego completado?: "+success);
+    // Put
+    this.pengine.query(queryS, (success, response) => { 
       if (success) {
-        // Hacer cambios para juego ganado       
-      
-        this.setState({          
+        this.setState({ // Por ahora seteo la nueva grilla
+          grid: response['GrillaRes'],
           waiting: false
         });
-      } else { // Si todavia no se gano el juego
 
-        // Build Prolog query to make the move, which will look as follows:
-        // put("#",[0,1],[], [],[["X",_,_,_,_],["X",_,"X",_,_],["X",_,_,_,_],["#","#","#",_,_],[_,_,"#","#","#"]], GrillaRes, FilaSat, ColSat)
+        //Check: para pintar clue boxes
+        this.checkRow(i);
+        this.checkCol(j);
 
-        const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + '], [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
-
-        this.pengine.query(queryS, (success, response) => { // Put
-          if (success) {
-            this.setState({ // Por ahora seteo la nueva grilla
-              grid: response['GrillaRes'],
-              waiting: false
-            });
-
-            this.checkRow(i);
-            this.checkCol(j);
-
-            this.setState({
-              waiting: false
-            });
-          }
-        });
-
-        this.setState({          
-          waiting: false
-        });
-        
+        //Check: para finalizar el juego
+        this.checkAll();
       }
+    });
 
+    this.setState({          
+      waiting: false
     });
   }
 
@@ -101,15 +79,6 @@ class Game extends React.Component {
 
   cruzHC(){
     this.setState({mode: "X"});
-  }
-
-  switchMode() {
-    if (this.props.mode === "#") {
-      this.setState({mode: "X"});
-    }
-    else {
-      this.setState({mode: "#"});
-    }
   }
 
   /**
@@ -126,6 +95,33 @@ class Game extends React.Component {
       this.checkCol(j);
     }
 
+    // Asumiendo que es posible que el estado incial del juego esté completamente bien:
+    this.checkAll();
+
+  }
+
+  /**
+   * Verifica si la grilla está correctamente completa y finaliza el nivel.
+   */
+  checkAll() {
+
+    this.setState({waiting: true});
+
+    const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
+    const cClues = JSON.stringify(this.state.colClues);
+    const rClues = JSON.stringify(this.state.rowClues);
+
+    const queryCheckAll = 'check_todo('+rClues+','+ cClues +','+ squaresS + ')';
+
+    this.pengine.query(queryCheckAll, (success, response) => {
+      console.log("Juego completado?: "+success);
+
+      if (success) {     
+        this.setState({endGame: true});
+      }
+
+      this.setState({waiting: false});
+    });
   }
 
   checkRow(i) {
@@ -159,8 +155,14 @@ class Game extends React.Component {
     if (this.state.grid === null) {
       return null;
     }
-    const statusText = 'Keep playing!';
-    const modeText = 'Mode';
+    else if (this.state.endGame) {
+      return (
+        <div>
+          <img src="src/img/stageclear.jpg"></img>
+          <p>FIN DE JUEGO</p>
+        </div>
+      );
+    }
 
     return (
       
