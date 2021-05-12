@@ -34,6 +34,9 @@ class Game extends React.Component {
           checkedRowClues: Array(response['PistasFilas'].length).fill(false),
           checkedColClues: Array(response['PistasColumns'].length).fill(false)
         });
+
+        this.initialGridCheck();
+
       }
     });
   }
@@ -128,6 +131,44 @@ class Game extends React.Component {
     else {
       this.setState({mode: "#"});
     }
+  }
+
+  initialGridCheck() {
+    console.log("RowClues length: " + this.state.rowClues.length);
+    for (var i = 0; i < this.state.rowClues.length; i++){
+      console.log("Checking row: " + i);
+      this.checkRow(i);
+    }
+    for (var j = 0; j < this.state.colClues.length; j++){
+      this.checkCol(j);
+    }
+  }
+
+  checkRow(i) {
+    const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Nueva grilla en string.
+    const rClues = JSON.stringify(this.state.rowClues);
+    const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ')';
+    // Check fila
+    this.pengine.query(queryCheckFila, (success, response) => { 
+      const newCheckedRowClues = this.state.checkedRowClues.slice();
+      newCheckedRowClues[i] = success;
+      this.setState({checkedRowClues: newCheckedRowClues});
+      console.log("Checked rows: " + this.state.checkedRowClues);
+    });
+  }
+
+  checkCol(i) {
+    const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Nueva grilla en string.
+    const cClues = JSON.stringify(this.state.colClues);
+    const queryCheckColumna = 'check_pistas_columna('+i+','+ cClues +','+ nGrilla + ')';
+
+    // Check columna
+    this.pengine.query(queryCheckColumna, (success, response) => {
+      const newCheckedColClues = this.state.checkedColClues.slice();
+      newCheckedColClues[i] = success;
+      this.setState({checkedColClues: newCheckedColClues});
+      console.log("Checked cols: " + this.state.checkedColClues);
+    });
   }
 
   render() {
