@@ -26,11 +26,33 @@ replace(X, XIndex, Y, [Xi|Xs], [Xi|XsY]):-
 %
 % put(+Contenido, +Pos, +PistasFilas, +PistasColumnas, +Grilla, -GrillaRes, -FilaSat, -ColSat).
 %
+/* ej.
+?- put(		"#",						% Contenido
+			[4,1],						% Pos
+			[[5], [1], [1], [1], [1]],	% PistasFilas
+			[[5], [1], [1], [1], [1]], 	% PistasColumnas
 
-put(Contenido, [RowN, ColN], _PistasFilas, _PistasColumnas, Grilla, NewGrilla, 0, 0):-
+		   [["#","#","#","#","#"], 		
+			["#", _ , _ , _ , _ ],
+			["#", _ , _ , _ , _ ],		% Grilla
+			["#", _ , _ , _ , _ ],
+			[ _ , _ , _ , _ , _ ]],
+			
+			GrillaRes,
+			FilaSat,
+			ColSat).
+
+ColSat = 0,
+FilaSat = 1,
+GrillaRes = [[ "#" ,  "#" ,  "#" ,  "#" ,  "#" ],
+			 [ "#" , _2150, _2156, _2162, _2168],
+			 [ "#" , _2192, _2198, _2204, _2210],
+			 [ "#" , _2234, _2240, _2246, _2252],
+			 [_2264,  "#" , _2282, _2288, _2294]]
+*/
+put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, FilaSat, ColSat):-
 	% NewGrilla es el resultado de reemplazar la fila Row en la posición RowN de Grilla
 	% (RowN-ésima fila de Grilla), por una fila nueva NewRow.
-	
 	replace(Row, RowN, NewRow, Grilla, NewGrilla),
 
 	% NewRow es el resultado de reemplazar la celda Cell en la posición ColN de Row por _,
@@ -41,7 +63,10 @@ put(Contenido, [RowN, ColN], _PistasFilas, _PistasColumnas, Grilla, NewGrilla, 0
 	(replace(Cell, ColN, _, Row, NewRow),
 	Cell == Contenido 
 		;
-	replace(_Cell, ColN, Contenido, Row, NewRow)).
+	replace(_Cell, ColN, Contenido, Row, NewRow)),
+	% Luego de tener la nueva grilla, verificar si la fila y columna afectadas satisfacen las pistas.
+	check_pistas_fila(RowN, PistasFilas, NewGrilla, FilaSat),
+	check_pistas_columna(ColN, PistasColumnas, NewGrilla, ColSat).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,7 +145,7 @@ contarPintadasFila([C | Cs], CantPintadasFila) :-
 % check_pistas_columna(+Nro_col, +PistasCol, +Grilla).
 %
 % Asume 0 como posicion inicial de una lista.
-% true si la columna en la posicion Nro_col respeta las pistas, false caso contrario.
+% ColSat devuelve 1 si la columna en la posicion Nro_col respeta las pistas, 0 caso contrario.
 %
 /*	ej.
 
@@ -131,21 +156,23 @@ contarPintadasFila([C | Cs], CantPintadasFila) :-
 							["#", _ , _ , _ , _ ],
 							["#", _ , _ , _ , _ ],		% Grilla
 							["#", _ , _ , _ , _ ],
-							["#", _ , _ , _ , _ ]]).
+							["#", _ , _ , _ , _ ]],
+							
+							ColSat).
 
- true.
+ ColSat = 1.
 */
-check_pistas_columna(Nro_col, PistasCol, Grilla):-
+check_pistas_columna(Nro_col, PistasCol, Grilla, ColSat):-
     obtener_columna(Nro_col, Grilla, ColumnaRes),
     obtener_pistas(Nro_col, PistasCol, PistasRes),
-    check_pistas(PistasRes, ColumnaRes).
+    check_pistas(PistasRes, ColumnaRes, ColSat).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % check_pistas_fila(+Nro_fil, +PistasFil, +Grilla).
 %
 % Asume 0 como posicion inicial de una lista.
-% true si la fila en la posicion Nro_fil respeta las pistas, falso caso contrario.
+% FilaSat devuelve 1 si la fila en la posicion Nro_fil respeta las pistas, 0 caso contrario.
 %
 /*	ej.
 
@@ -156,14 +183,16 @@ check_pistas_columna(Nro_col, PistasCol, Grilla):-
 							["#", _ , _ , _ , _ ],
 							["#", _ , _ , _ , _ ],		% Grilla
 							["#", _ , _ , _ , _ ],
-							["#", _ , _ , _ , _ ]]).
+							["#", _ , _ , _ , _ ]],
+							
+							FilaSat).
 
- true.
+ FilaSat = 1.
 */
-check_pistas_fila(Nro_fil, PistasFil, Grilla):-
+check_pistas_fila(Nro_fil, PistasFil, Grilla, FilaSat):-
     obtener_fila(Nro_fil, Grilla, FilaRes),
     obtener_pistas(Nro_fil, PistasFil, PistasRes),
-    check_pistas(PistasRes, FilaRes).
+    check_pistas(PistasRes, FilaRes, FilaSat).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -214,7 +243,8 @@ true.
 */
 check_todas_columnas(-1, _PistasCol, _Grilla).
 check_todas_columnas(Nro_col, PistasCol, Grilla):-
-    check_pistas_columna(Nro_col, PistasCol, Grilla),
+    check_pistas_columna(Nro_col, PistasCol, Grilla, ColSat),
+	ColSat == 1, % Si la columna satisface, continuar.
     Nro_col_aux is Nro_col -1,
     check_todas_columnas(Nro_col_aux, PistasCol, Grilla).
 
@@ -240,7 +270,8 @@ false.
 */
 check_todas_filas(-1, _PistasFil, _Grilla).
 check_todas_filas(Nro_fil, PistasFil, Grilla):-
-    check_pistas_fila(Nro_fil, PistasFil, Grilla),
+    check_pistas_fila(Nro_fil, PistasFil, Grilla, FilaSat),
+	FilaSat == 1, % Si la fila satisface, continuar.
     Nro_fil_aux is Nro_fil -1,
     check_todas_filas(Nro_fil_aux, PistasFil, Grilla).
 
@@ -331,9 +362,9 @@ buscar_pos(Pos, [_H|T], ElementoRes):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% check_pistas(+Pistas, +Lista).
+% check_pistas(+Pistas, +Lista, -Satisface).
 %
-% true si la lista respeta las pistas, false caso contrario.
+% Satisface devuelve 1 si la lista respeta las pistas, 0 caso contrario.
 % 
 % Esta parte busca la primer celda pintada,
 % de la Lista se ignoran las celdas no pintadas, dejandola con un "#" al principio.
@@ -341,23 +372,24 @@ buscar_pos(Pos, [_H|T], ElementoRes):-
 /* ej.
 
 ?- check_pistas( 	[1,1,1],				% Pistas
-					["#", _ ,"#", _ ,"#"] 	% Lista
-				).
+					["#", _ ,"#", _ ,"#"], 	% Lista
+				
+					Satisface).
 
-true.
+Satisface = 1.
 */
-check_pistas(Pistas,[H2|Listita]):- %Si encuentro celda pintada, asegurarme que respete la secuencia de las pistas.
+check_pistas(Pistas,[H2|Listita], Satisface):- %Si encuentro celda pintada, asegurarme que respete la secuencia de las pistas.
     H2 == "#",    
-    check_pistas_secuencia(Pistas, [H2|Listita]).
-check_pistas(Pistas,[H2|Listita]):- %Si encuentro celda no pintada, avanzo en la lista.
+    check_pistas_secuencia(Pistas, [H2|Listita], Satisface).
+check_pistas(Pistas,[H2|Listita], Satisface):- %Si encuentro celda no pintada, avanzo en la lista.
     H2 \== "#",
-    check_pistas(Pistas, Listita).
+    check_pistas(Pistas, Listita, Satisface).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% check_pistas_secuencia(+Pistas, +Lista).
+% check_pistas_secuencia(+Pistas, +Lista, -Satisface).
 %
-% true si la Lista recorrida por check_pistas/2 comienza con N de celdas pintadas, false caso contrario.
+% Satisface = 1 si la Lista recorrida por check_pistas/2 comienza con N de celdas pintadas, 0 caso contrario.
 % donde N es la primer pista en Pistas.
 %
 % Esta parte al encontrar la secuencia, remueve la primer pista en Pistas y devuelve
@@ -366,24 +398,25 @@ check_pistas(Pistas,[H2|Listita]):- %Si encuentro celda no pintada, avanzo en la
 /* ej.
 
 ?- check_pistas_secuencia( 	[5],					% Pistas
-							["#","#","#","#", _ ] 	% Lista
-						).
+							["#","#","#","#", _ ], 	% Lista
+							Satisface).
 
-false.
+Satisface = 0.
 */
-check_pistas_secuencia([0],[]). %Si recorri toda la lista y no hay mas pistas, terminé, devuelvo true.
-check_pistas_secuencia([0],Listita):- check_pistas_aux(Listita). % Cuando agoto todas las pistas, y todavia hay elementos en la lista me fijo que no queden celdas pintadas en el resto de la lista.
-check_pistas_secuencia([0|Pistitas],[H|Listita]):- %Cuando agoto una pista, aseguro que haya un espacio entre pistas, remuevo la pista agotada de Pistas.
+check_pistas_secuencia([0],[],1). %Si recorri toda la lista y no hay mas pistas, terminé, devuelvo 1.
+check_pistas_secuencia([0],Listita, Satisface):- check_pistas_aux(Listita, Satisface). % Cuando agoto todas las pistas, y todavia hay elementos en la lista me fijo que no queden celdas pintadas en el resto de la lista.
+check_pistas_secuencia([0|Pistitas],[H|Listita], Satisface):- %Cuando agoto una pista, aseguro que haya un espacio entre pistas, remuevo la pista agotada de Pistas.
     H \== "#",
-    check_pistas(Pistitas,Listita).
-check_pistas_secuencia([H1|Pistitas], [H2|Listita]):- % Por cada celda pintada se disminuye la pista.
+    check_pistas(Pistitas,Listita, Satisface).
+check_pistas_secuencia([H1|Pistitas], [H2|Listita], Satisface):- % Por cada celda pintada se disminuye la pista.
     H2 == "#",
     H1_aux is H1 -1,
-    check_pistas_secuencia([H1_aux|Pistitas], Listita).
+    check_pistas_secuencia([H1_aux|Pistitas], Listita, Satisface).
+check_pistas_secuencia(_Pistas,_Listas, 0). % Si falla en alguna parte del check, devolver 0.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% check_pistas_aux(+Lista).
+% check_pistas_aux(+Lista, -Satisface).
 %
 % true si la Lista no tiene celdas pintadas, false caso contrario.
 %
@@ -391,14 +424,16 @@ check_pistas_secuencia([H1|Pistitas], [H2|Listita]):- % Por cada celda pintada s
 
 ?- check_pistas_aux( 	[ _ , _ ,"X", _ , _ ] 	% Lista
 
-					).
+						Satisface).
 
-true.
+Satisface = 1.
 */
-check_pistas_aux([]).
-check_pistas_aux([H|Listita]):-
+check_pistas_aux([], 1). 		% No habia celdas pintadas, devolver 1.
+check_pistas_aux([H|Listita], Satisface):- % Ver si hay celdas pintadas.
     H \== "#",
-    check_pistas_aux(Listita).
+    check_pistas_aux(Listita, Satisface).
+check_pistas_aux([H|_Listita], 0):- 	% Si hay una celda pintada, devolver 0.
+	H == "#".
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
