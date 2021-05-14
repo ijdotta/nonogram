@@ -158,7 +158,7 @@ class Game extends React.Component {
     else if (this.state.endGame) {
       return (
         <div>
-          <img src="src/img/stageclear.jpg"></img>
+          <img href="./img/stageclear.jpg"></img>
           <p>FIN DE JUEGO</p>
         </div>
       );

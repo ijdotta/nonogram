@@ -23,7 +23,7 @@ body {
   outline: none;
 }
 
-.square:hover {
+.square:not(:focus):hover {
   background: #dbe5e9;
 }
 
@@ -126,7 +126,7 @@ body {
   background: white;
 }
 
-.modeBox:hover {
+.modeBox:not(:focus):hover {
   background-color: #cee3eb;
 }
 
