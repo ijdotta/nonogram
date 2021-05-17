@@ -2,9 +2,9 @@
 :- module(init, [ init/3 ]).
 
 init(
-[[5], [1], [1], [1], [1]],	% PistasFilas
+[[1,3], [0], [1], [1], [1]],	% PistasFilas
 
-[[5], [1], [1], [1], [1]], 	% PistasColumnas
+[[1,3], [0], [1], [1], [1]], 	% PistasColumnas
 
 [["X", _ , _ , _ , _ ], 		
  ["X", _ ,"X", _ , _ ],

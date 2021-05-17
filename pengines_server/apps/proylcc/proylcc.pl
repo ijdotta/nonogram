@@ -384,7 +384,7 @@ check_pistas(Pistas,[H2|Listita], Satisface):- %Si encuentro celda pintada, aseg
 check_pistas(Pistas,[H2|Listita], Satisface):- %Si encuentro celda no pintada, avanzo en la lista.
     H2 \== "#",
     check_pistas(Pistas, Listita, Satisface).
-check_pistas([],[], 1):- %Si no hay pistas y recorrí toda la lista sin encontrar una celda, satisface, devuelvo 1.
+check_pistas([],[], 1). %Si no hay pistas y recorrí toda la lista sin encontrar una celda, satisface, devuelvo 1.
 check_pistas(_Pistas,[], 0):- %Si habian pistas y recorrí toda la lista sin encontrar una celda, no satisface, devuelvo 0.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
