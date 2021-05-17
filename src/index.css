@@ -42,6 +42,7 @@ body {
 
 .horizontal {
   display: flex;
+  align-self: flex-end;
 }
 
 .vertical {
@@ -51,10 +52,13 @@ body {
 
 .rowClues {
   display: grid;
+  min-width: 60px;
 }
 
 .colClues {
   display: grid;
+  align-self:flex-end;
+  min-height: 60px;
 }
 
 .clue {
@@ -106,7 +110,6 @@ body {
   background: #d0dfe4;
   border-radius: 500px;
   margin-top: 10px;
-  margin-left: 65px;
 }
 
 .modeBox {

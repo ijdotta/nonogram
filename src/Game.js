@@ -44,7 +44,7 @@ class Game extends React.Component {
 
   handleClick(i, j) {
 
-    if (this.state.waiting) {
+    if (this.state.waiting || this.state.endGame) {
       return;
     }
 
@@ -53,6 +53,8 @@ class Game extends React.Component {
     const cClues = JSON.stringify(this.state.colClues).replaceAll('"_"', "_"); // Remove quotes for variables.
     
     const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + '], ' + rClues + ', ' + cClues + ',' + squaresS + ', GrillaRes, FilaSat, ColSat)';
+
+    console.log("QUERY: " + queryS);
 
     // Put
     this.pengine.query(queryS, (success, response) => {
@@ -75,6 +77,9 @@ class Game extends React.Component {
           checkedRowClues: newCheckedRowClues,
           checkedColClues: newCheckedColClues
         });
+
+        console.log("CheckedRowClues: " + this.state.checkedRowClues);
+        console.log("CheckedColClues: " + this.state.checkedColClues);
 
         //Check: para finalizar el juego
         this.checkAll();
@@ -146,6 +151,8 @@ class Game extends React.Component {
       newCheckedRowClues[i] = response['FilaSat'] === 1;
       this.setState({checkedRowClues: newCheckedRowClues});
     });
+
+    console.log("CheckedRowClues: " + this.state.checkedRowClues);
   }
 
   checkCol(i) {
@@ -159,19 +166,20 @@ class Game extends React.Component {
       newCheckedColClues[i] = response['ColSat'] === 1;
       this.setState({checkedColClues: newCheckedColClues});
     });
+
+    
+    console.log("CheckedColClues: " + this.state.checkedColClues);
   }
 
   render() {
+
+    var gameStatus = "¡Sigue jugando!";
+
     if (this.state.grid === null) {
       return null;
     }
     else if (this.state.endGame) {
-      return (
-        <div>
-          <img src="img/stageclear.jpg"></img>
-          <p>FIN DE JUEGO</p>
-        </div>
-      );
+      gameStatus = "FIN DE JUEGO";
     }
 
     return (
@@ -186,6 +194,8 @@ class Game extends React.Component {
             checkedColClues={this.state.checkedColClues}
             onClick={(i, j) => this.handleClick(i,j)}
           />
+
+          <div className="gameSatus">{gameStatus}</div>
 
           <div className="modeSelect">
             <ModeSelector
