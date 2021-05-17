@@ -5,7 +5,6 @@ class ModeBox extends React.Component {
 
         const selected = this.props.selected;
         const value = this.props.value;
-        console.log("Selected: " + selected);
 
         const type = value === "#"? "paint" : "cross";
 

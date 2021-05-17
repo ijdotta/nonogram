@@ -49,10 +49,14 @@ class Game extends React.Component {
     }
 
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
-    const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + '], [], [],' + squaresS + ', GrillaRes, FilaSat, ColSat)';
+    const rClues = JSON.stringify(this.state.rowClues).replaceAll('"_"', "_"); // Remove quotes for variables.
+    const cClues = JSON.stringify(this.state.colClues).replaceAll('"_"', "_"); // Remove quotes for variables.
+    
+    const queryS = 'put("' + this.state.mode +'", [' + i + ',' + j + '], ' + rClues + ', ' + cClues + ',' + squaresS + ', GrillaRes, FilaSat, ColSat)';
 
     // Put
-    this.pengine.query(queryS, (success, response) => { 
+    this.pengine.query(queryS, (success, response) => {
+      console.log("Success: " + success);
       if (success) {
         this.setState({ // Por ahora seteo la nueva grilla
           grid: response['GrillaRes'],
@@ -60,11 +64,19 @@ class Game extends React.Component {
         });
 
         //Check: para pintar clue boxes
-        this.checkRow(i);
-        this.checkCol(j);
+        const newCheckedRowClues = this.state.checkedRowClues.slice();
+        newCheckedRowClues[i] = response['FilaSat'] === 1;
+
+        const newCheckedColClues = this.state.checkedColClues.slice();
+        newCheckedColClues[j] = response['ColSat'] === 1;
+
+        this.setState({
+          checkedRowClues: newCheckedRowClues,
+          checkedColClues: newCheckedColClues
+        });
 
         //Check: para finalizar el juego
-        this.checkAll();
+        //this.checkAll();
       }
     });
 
@@ -116,7 +128,7 @@ class Game extends React.Component {
     this.pengine.query(queryCheckAll, (success, response) => {
       console.log("Juego completado?: "+success);
 
-      if (success) {     
+      if (success) {
         this.setState({endGame: true});
       }
 
@@ -127,11 +139,11 @@ class Game extends React.Component {
   checkRow(i) {
     const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Nueva grilla en string.
     const rClues = JSON.stringify(this.state.rowClues);
-    const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ')';
+    const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ' FilaSat)';
     // Check fila
     this.pengine.query(queryCheckFila, (success, response) => { 
       const newCheckedRowClues = this.state.checkedRowClues.slice();
-      newCheckedRowClues[i] = success;
+      newCheckedRowClues[i] = response['FilaSat'] === 1;
       this.setState({checkedRowClues: newCheckedRowClues});
       console.log("Checked rows: " + this.state.checkedRowClues);
     });
@@ -140,12 +152,12 @@ class Game extends React.Component {
   checkCol(i) {
     const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Nueva grilla en string.
     const cClues = JSON.stringify(this.state.colClues);
-    const queryCheckColumna = 'check_pistas_columna('+i+','+ cClues +','+ nGrilla + ')';
+    const queryCheckColumna = 'check_pistas_columna('+i+','+ cClues +','+ nGrilla + ' ColSat)';
 
     // Check columna
     this.pengine.query(queryCheckColumna, (success, response) => {
       const newCheckedColClues = this.state.checkedColClues.slice();
-      newCheckedColClues[i] = success;
+      newCheckedColClues[i] = response['ColSat'] === 1;
       this.setState({checkedColClues: newCheckedColClues});
       console.log("Checked cols: " + this.state.checkedColClues);
     });
