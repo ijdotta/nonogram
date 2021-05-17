@@ -71,21 +71,23 @@ class Game extends React.Component {
      *  [rowClues, colClues, grid]
      */
 
-    this.setState({
-      rowClues: levelData[0],
-      colClues: levelData[1],
-      grid: levelData[2],
-      checkedRowClues: Array(levelData[0].length).fill(false),
-      checkedColClues: Array(levelData[1].length).fill(false),
-      level: (nLevel + 1),
-      endGame: false
-    });
+    this.setState(
+      {
+        rowClues: levelData[0],
+        colClues: levelData[1],
+        grid: levelData[2],
+        checkedRowClues: Array(levelData[0].length).fill(false),
+        checkedColClues: Array(levelData[1].length).fill(false),
+        level: (nLevel + 1),
+        endGame: false
+      },
+      this.initialGridCheck //Callback function (espera al setState para no chequear sobre el tablero anterior)
+    );
 
     this.setState({
       waiting: false
     });
 
-    //this.initialGridCheck();
   }
 
   handleClick(i, j) {
@@ -227,7 +229,11 @@ class Game extends React.Component {
       return null;
     }
     else if (this.state.endGame) {
-      gameStatus = "FIN DE JUEGO";
+      if (this.state.level <= this.state.maxLevelIndex) {
+        gameStatus = "¡Avance al siguiente nivel!";
+      } else {
+        gameStatus = "FIN DE JUEGO";
+      }
     }
 
     return (
