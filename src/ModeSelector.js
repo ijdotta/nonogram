@@ -3,7 +3,6 @@ import ModeBox from './ModeBox';
 
 class ModeSelector extends React.Component {
     render() {
-        console.log("Mode: " + this.props.mode);
         return (
             <div className="modeSelector">
 
