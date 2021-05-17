@@ -1,5 +1,10 @@
 
-:- module(init, [ init/3 ]).
+:- module(init, 
+        [ init/3 ,
+          init/1 ]).
+
+init(Inits) :-
+    findall([RowClue, ColClue, Grid], init(RowClue, ColClue, Grid), Inits).
 
 /*init(
 [[5], [1], [1], [1], [1], [],[3, 1],[3, 1],[5,4,3,2,1]],	% PistasFilas
@@ -19,6 +24,9 @@
 ).
 */
 
+init([[1]],[[1]],[[_]]).
+init([[]],[[]],[[_]]).
+/*
 init(
 [[1,3], [], [1], [1], [1]],	% PistasFilas
 
@@ -31,7 +39,7 @@ init(
  [ _ , _ ,"#","#","#"]
 ]
 ).
-
+*/
 /*
 init(
 [[5], [1], [], [1], [1]],	% PistasFilas
@@ -61,3 +69,4 @@ init(
 ]
 ).
 */
+

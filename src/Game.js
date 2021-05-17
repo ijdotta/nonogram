@@ -11,6 +11,8 @@ class Game extends React.Component {
     super(props);
     this.state = {
       mode: "#",
+      levels: null,
+      level: 0,
       grid: null,
       rowClues: null,
       colClues: null,
@@ -25,9 +27,28 @@ class Game extends React.Component {
   }
 
   handlePengineCreate() {
-    const queryS = 'init(PistasFilas, PistasColumns, Grilla)';
+    //const queryS = 'init(PistasFilas, PistasColumns, Grilla)';
+    const queryS = 'init(Inits)';
     this.pengine.query(queryS, (success, response) => {
       if (success) {
+
+        console.log("Inits: " + response['Inits']);
+        const nLevels = response['Inits'].slice();
+        
+        for (var i = 0; i < nLevels.length; i++) {
+          console.log(nLevels[i]);
+          for (var j = 0; j < nLevels[i].length; j++) {
+            console.log(nLevels[i][j]);
+          }
+        }
+
+        this.setState({
+          levels: nLevels
+        })
+
+        this.nextLevel();
+
+        /*
         this.setState({
           grid: response['Grilla'],
           rowClues: response['PistasFilas'],
@@ -37,15 +58,48 @@ class Game extends React.Component {
         });
 
         this.initialGridCheck();
-
+        */
       }
     });
   }
 
+  nextLevel() {
+
+    if (this.state.waiting){
+      return;
+    }
+
+    console.log("Pre-nextlevel" + this.state.level);
+
+
+    const nLevel = this.state.level;
+    const levelData = this.state.levels[nLevel].slice();
+
+    /**
+     * Level data format:
+     *  [rowClues, colClues, grid]
+     */
+
+    this.setState({
+      rowClues: levelData[0],
+      colClues: levelData[1],
+      grid: levelData[2],
+      checkedRowClues: Array(levelData[0].length).fill(false),
+      checkedColClues: Array(levelData[1].length).fill(false),
+      level: (nLevel + 1)
+    });
+
+    this.initialGridCheck();
+    console.log("Post-nextlevel" + this.state.level);
+  }
+
   handleClick(i, j) {
 
-    if (this.state.waiting || this.state.endGame) {
+    if (this.state.waiting) {
       return;
+    }
+    else if (this.state.endGame) {
+      this.nextLevel();
     }
 
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
