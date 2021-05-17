@@ -2,6 +2,7 @@ import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
 import ModeSelector from './ModeSelector';
+import LevelUpdater from './LevelUpdate';
 
 class Game extends React.Component {
 
@@ -13,13 +14,14 @@ class Game extends React.Component {
       mode: "#",
       levels: null,
       level: 0,
+      maxLevelIndex: 0,
       grid: null,
       rowClues: null,
       colClues: null,
       checkedRowClues: null,
       checkedColClues: null,
       waiting: false,
-      endGame: false
+      endGame: true
     };
     this.handleClick = this.handleClick.bind(this);
     this.handlePengineCreate = this.handlePengineCreate.bind(this);
@@ -32,47 +34,36 @@ class Game extends React.Component {
     this.pengine.query(queryS, (success, response) => {
       if (success) {
 
-        console.log("Inits: " + response['Inits']);
         const nLevels = response['Inits'].slice();
-        
-        for (var i = 0; i < nLevels.length; i++) {
-          console.log(nLevels[i]);
-          for (var j = 0; j < nLevels[i].length; j++) {
-            console.log(nLevels[i][j]);
-          }
-        }
 
         this.setState({
-          levels: nLevels
+          levels: nLevels,
+          maxLevelIndex: nLevels.length - 1
         })
 
         this.nextLevel();
-
-        /*
-        this.setState({
-          grid: response['Grilla'],
-          rowClues: response['PistasFilas'],
-          colClues: response['PistasColumns'],
-          checkedRowClues: Array(response['PistasFilas'].length).fill(false),
-          checkedColClues: Array(response['PistasColumns'].length).fill(false)
-        });
-
-        this.initialGridCheck();
-        */
       }
     });
   }
 
   nextLevel() {
 
-    if (this.state.waiting){
+    if (!this.state.endGame){
       return;
     }
 
-    console.log("Pre-nextlevel" + this.state.level);
+    this.setState({
+      waiting: true
+    });
 
 
     const nLevel = this.state.level;
+
+    console.log("MaxLevel / level :: " + this.state.maxLevelIndex + "/" + nLevel);
+    if (nLevel > this.state.maxLevelIndex) {
+      return;
+    }
+
     const levelData = this.state.levels[nLevel].slice();
 
     /**
@@ -86,20 +77,23 @@ class Game extends React.Component {
       grid: levelData[2],
       checkedRowClues: Array(levelData[0].length).fill(false),
       checkedColClues: Array(levelData[1].length).fill(false),
-      level: (nLevel + 1)
+      level: (nLevel + 1),
+      endGame: false
     });
 
-    this.initialGridCheck();
-    console.log("Post-nextlevel" + this.state.level);
+    this.setState({
+      waiting: false
+    });
+
+    //this.initialGridCheck();
   }
 
   handleClick(i, j) {
 
-    if (this.state.waiting) {
+    console.log("EndGame: " + this.state.endGame);
+
+    if (this.state.waiting || this.state.endGame) {
       return;
-    }
-    else if (this.state.endGame) {
-      this.nextLevel();
     }
 
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
@@ -260,6 +254,12 @@ class Game extends React.Component {
             />
           </div>
 
+          <div>
+            <LevelUpdater
+              onClick={() => this.nextLevel()}
+              content={'nextLevel'}
+            />
+          </div>
         
       </div>
     );
