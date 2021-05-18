@@ -179,13 +179,15 @@ class Game extends React.Component {
       return null;
     }
     else if (this.state.endGame) {
-      gameStatus = "FIN DE JUEGO";
+      gameStatus = "¡Has ganado!";
     }
 
     return (
       
       <div className="game center">
         
+        <div className="gameStatus">{gameStatus}</div>
+
           <Board
             grid={this.state.grid}
             rowClues={this.state.rowClues}
@@ -194,8 +196,6 @@ class Game extends React.Component {
             checkedColClues={this.state.checkedColClues}
             onClick={(i, j) => this.handleClick(i,j)}
           />
-
-          <div className="gameSatus">{gameStatus}</div>
 
           <div className="modeSelect">
             <ModeSelector
