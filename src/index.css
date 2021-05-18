@@ -114,12 +114,21 @@ body {
   overflow: hidden;
 }
 
+.buttons {
+  display: flex;
+}
+
 .modeSelector {
   display: flex;
   flex-direction: row;
   background: #d0dfe4;
   border-radius: 500px;
   margin-top: 10px;
+}
+
+.nextLevelBtnContainer {
+  margin: 10px 10px;
+  border-radius: 500px;
 }
 
 .modeBox {
@@ -139,7 +148,28 @@ body {
   background: white;
 }
 
-.modeBox:not(:focus):hover {
+.nextLevelBtn {
+  font-size: 25px;
+  text-align: center;
+  color: black;
+  font-weight: 700;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+  height: 55px;
+  width: 55px;
+  border-radius: 50px;
+  background: white;
+}
+
+.hidden {
+  display: none;
+}
+
+.modeBox:not(:focus):hover, .nextLevelBtn:not(:focus):hover {
   background-color: #cee3eb;
 }
 

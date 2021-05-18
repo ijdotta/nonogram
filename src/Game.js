@@ -224,6 +224,7 @@ class Game extends React.Component {
   render() {
 
     var gameStatus = "¡Sigue jugando!";
+    var hide = " hidden";
 
     if (this.state.grid === null) {
       return null;
@@ -231,6 +232,7 @@ class Game extends React.Component {
     else if (this.state.endGame) {
       if (this.state.level <= this.state.maxLevelIndex) {
         gameStatus = "Avanza al siguiente nivel";
+        hide = "";
       } else {
         gameStatus = "¡Has ganado!";
       }
@@ -251,20 +253,24 @@ class Game extends React.Component {
             onClick={(i, j) => this.handleClick(i,j)}
           />
 
-          <div className="modeSelect">
-            <ModeSelector
-              mode = {this.state.mode}
-              onCruzClick={() => this.cruzHC()}
-              onNumeralClick={() => this.numeralHC()}
-              onClick={(i, j) => this.mBhandleClick(i,j)}
-            />
-          </div>
+          <div className="buttons">
 
-          <div>
-            <LevelUpdater
-              onClick={() => this.nextLevel()}
-              content={'nextLevel'}
-            />
+            <div className="modeSelect">
+              <ModeSelector
+                mode = {this.state.mode}
+                onCruzClick={() => this.cruzHC()}
+                onNumeralClick={() => this.numeralHC()}
+                onClick={(i, j) => this.mBhandleClick(i,j)}
+              />
+            </div>
+
+            <div className={"nextLevelBtnContainer" + hide}>
+              <LevelUpdater
+                onClick={() => this.nextLevel()}
+                content={'>>'}
+              />
+            </div>
+
           </div>
         
       </div>
