@@ -230,9 +230,9 @@ class Game extends React.Component {
     }
     else if (this.state.endGame) {
       if (this.state.level <= this.state.maxLevelIndex) {
-        gameStatus = "¡Avance al siguiente nivel!";
+        gameStatus = "Avanza al siguiente nivel";
       } else {
-        gameStatus = "FIN DE JUEGO";
+        gameStatus = "¡Has ganado!";
       }
     }
 
@@ -240,6 +240,8 @@ class Game extends React.Component {
       
       <div className="game center">
         
+        <div className="gameStatus">{gameStatus}</div>
+
           <Board
             grid={this.state.grid}
             rowClues={this.state.rowClues}
@@ -248,8 +250,6 @@ class Game extends React.Component {
             checkedColClues={this.state.checkedColClues}
             onClick={(i, j) => this.handleClick(i,j)}
           />
-
-          <div className="gameSatus">{gameStatus}</div>
 
           <div className="modeSelect">
             <ModeSelector
