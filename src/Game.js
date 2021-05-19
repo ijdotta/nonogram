@@ -136,11 +136,11 @@ class Game extends React.Component {
     });
   }
 
-  numeralHC(){
+  setPaintingState(){
     this.setState({mode: "#"});
   }
 
-  cruzHC(){
+  setCrossingState(){
     this.setState({mode: "X"});
   }
 
@@ -253,8 +253,8 @@ class Game extends React.Component {
             <div className="modeSelect">
               <ModeSelector
                 mode = {this.state.mode}
-                onCruzClick={() => this.cruzHC()}
-                onNumeralClick={() => this.numeralHC()}
+                setCrossingState={() => this.setCrossingState()}
+                setPaintingState={() => this.setPaintingState()}
               />
             </div>
 

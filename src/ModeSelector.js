@@ -10,7 +10,7 @@ class ModeSelector extends React.Component {
                     <ModeBox
                         value={"X"}
                         selected={(this.props.mode === "X")}
-                        onClick={() => this.props.onCruzClick()}
+                        onClick={() => this.props.setCrossingState()}
                         key={'mCruz'}
                     />
                 </div>
@@ -19,7 +19,7 @@ class ModeSelector extends React.Component {
                     <ModeBox
                         value={"#"}
                         selected={(this.props.mode === "#")}
-                        onClick={() => this.props.onNumeralClick()}
+                        onClick={() => this.props.setPaintingState()}
                         key={'mNumeral'}
                     />
                 </div>
