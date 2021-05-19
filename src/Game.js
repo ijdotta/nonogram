@@ -35,12 +35,14 @@ class Game extends React.Component {
 
         const nLevels = response['Inits'].slice();
 
-        this.setState({
-          levels: nLevels,
-          maxLevelIndex: nLevels.length - 1
-        })
+        this.setState(
+          {
+            levels: nLevels,
+            maxLevelIndex: nLevels.length - 1
+          },
+          this.nextLevel // Callback que espera a setState
+        )
 
-        this.nextLevel(); //ver de meterlo como callback de setState
       }
     });
   }
@@ -109,12 +111,7 @@ class Game extends React.Component {
     this.pengine.query(queryS, (success, response) => {
       console.log("Put success: " + success);
       if (success) {
-        this.setState({ // Por ahora seteo la nueva grilla
-          // Ver de meter todo en el setState de abajo 
-          grid: response['GrillaRes'],
-          waiting: false
-        });
-
+        
         //Check: para pintar clue boxes (filas)
         const newCheckedRowClues = this.state.checkedRowClues.slice();
         newCheckedRowClues[i] = response['FilaSat'] === 1;
@@ -123,13 +120,14 @@ class Game extends React.Component {
         const newCheckedColClues = this.state.checkedColClues.slice();
         newCheckedColClues[j] = response['ColSat'] === 1;
 
-        this.setState({
-          checkedRowClues: newCheckedRowClues,
-          checkedColClues: newCheckedColClues
-        });
-
-        //Check: para finalizar el juego
-        this.checkAll();
+        this.setState(
+          {
+            grid: response['GrillaRes'],
+            checkedRowClues: newCheckedRowClues,
+            checkedColClues: newCheckedColClues,
+          },
+          this.checkAll //Check: finalizar juego
+        );
       }
     });
 
