@@ -29,7 +29,6 @@ class Game extends React.Component {
   }
 
   handlePengineCreate() {
-    //const queryS = 'init(PistasFilas, PistasColumns, Grilla)';
     const queryS = 'init(Inits)';
     this.pengine.query(queryS, (success, response) => {
       if (success) {
@@ -41,7 +40,7 @@ class Game extends React.Component {
           maxLevelIndex: nLevels.length - 1
         })
 
-        this.nextLevel();
+        this.nextLevel(); //ver de meterlo como callback de setState
       }
     });
   }
@@ -59,7 +58,7 @@ class Game extends React.Component {
 
     const nLevel = this.state.level;
 
-    console.log("MaxLevel / level :: " + this.state.maxLevelIndex + "/" + nLevel);
+    console.log("MaxLevel / currentLevel :: " + this.state.maxLevelIndex + "/" + nLevel);
     if (nLevel > this.state.maxLevelIndex) {
       return;
     }
@@ -108,9 +107,10 @@ class Game extends React.Component {
 
     // Put
     this.pengine.query(queryS, (success, response) => {
-      console.log("Success: " + success);
+      console.log("Put success: " + success);
       if (success) {
         this.setState({ // Por ahora seteo la nueva grilla
+          // Ver de meter todo en el setState de abajo 
           grid: response['GrillaRes'],
           waiting: false
         });
@@ -127,9 +127,6 @@ class Game extends React.Component {
           checkedRowClues: newCheckedRowClues,
           checkedColClues: newCheckedColClues
         });
-
-        console.log("CheckedRowClues: " + this.state.checkedRowClues);
-        console.log("CheckedColClues: " + this.state.checkedColClues);
 
         //Check: para finalizar el juego
         this.checkAll();
@@ -192,9 +189,10 @@ class Game extends React.Component {
   }
 
   checkRow(i) {
-    const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Nueva grilla en string.
+    const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_");
     const rClues = JSON.stringify(this.state.rowClues);
     const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ', FilaSat)';
+
     // Check fila
     this.pengine.query(queryCheckFila, (success, response) => { 
       const newCheckedRowClues = this.state.checkedRowClues.slice();
@@ -206,7 +204,7 @@ class Game extends React.Component {
   }
 
   checkCol(i) {
-    const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Nueva grilla en string.
+    const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_");
     const cClues = JSON.stringify(this.state.colClues);
     const queryCheckColumna = 'check_pistas_columna('+i+','+ cClues +','+ nGrilla + ', ColSat)';
 
@@ -216,7 +214,6 @@ class Game extends React.Component {
       newCheckedColClues[i] = response['ColSat'] === 1;
       this.setState({checkedColClues: newCheckedColClues});
     });
-
     
     console.log("CheckedColClues: " + this.state.checkedColClues);
   }
@@ -260,7 +257,6 @@ class Game extends React.Component {
                 mode = {this.state.mode}
                 onCruzClick={() => this.cruzHC()}
                 onNumeralClick={() => this.numeralHC()}
-                onClick={(i, j) => this.mBhandleClick(i,j)}
               />
             </div>
 

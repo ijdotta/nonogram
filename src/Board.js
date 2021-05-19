@@ -22,8 +22,8 @@ class Board extends React.Component {
                         /*
                            60px  40px 40px 40px 40px 40px 40px 40px   (gridTemplateColumns)
                           ______ ____ ____ ____ ____ ____ ____ ____
-                         |      |    |    |    |    |    |    |    |  60px
-                         |      |    |    |    |    |    |    |    |  (gridTemplateRows)
+                         |      |    |    |    |    |    |    |    | 
+                         |      |    |    |    |    |    |    |    |  % altura adaptable
                           ------ ---- ---- ---- ---- ---- ---- ---- 
                          */
                     }}
@@ -38,7 +38,6 @@ class Board extends React.Component {
                         className="rowClues"
                         style={{
                             gridTemplateRows: 'repeat(' + numOfRows + ', 40px)',
-                            /* IDEM column clues above */
                         }}
                     >
                         {rowClues.map((clue, i) =>

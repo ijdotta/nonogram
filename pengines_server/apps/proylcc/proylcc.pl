@@ -1,9 +1,6 @@
 :- module(proylcc,
 	[  
-		put/8,
-		contarPintadas/2, %Solo para testing, remover en la versión final.
-		contarCasillerosPintar/2, %Testing
-		puedePintar/2 %Testing
+		put/8
 	]).
 
 :-use_module(library(lists)).
@@ -67,78 +64,6 @@ put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, Fil
 	% Luego de tener la nueva grilla, verificar si la fila y columna afectadas satisfacen las pistas.
 	check_pistas_fila(RowN, PistasFilas, NewGrilla, FilaSat),
 	check_pistas_columna(ColN, PistasColumnas, NewGrilla, ColSat).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% puedePintar(+Grid, +PistasColumnas).
-%
-puedePintar(Grid, PistasColumnas) :-
-	contarCasillerosPintar(PistasColumnas, CantAPintar),
-	contarPintadas(Grid, CantPintadas),
-	CantPintadas < CantAPintar.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% contarCasillerosPintar(+PistasColumnas, -CantidadAPintar).
-%
-contarCasillerosPintar([], 0).
-
-contarCasillerosPintar([Col | Cols], CantidadAPintar) :-
-	contarCasillerosPintarCol(Col, CantidadAPintarCol),
-	contarCasillerosPintar(Cols, CantidadAPintarCols),
-	CantidadAPintar is CantidadAPintarCol + CantidadAPintarCols.
-
-contarCasillerosPintarCol([], 0).
-
-contarCasillerosPintarCol([C | Cs], CantidadAPintar) :-
-	contarCasillerosPintarCol(Cs, CantidadAPintarSubCol),
-	CantidadAPintar is C + CantidadAPintarSubCol.
-	
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% contarPintadas(+GrillaActual, -CantidadPintadas).
-%
-% Observación: recordar que el formato de consulta de la grilla es con las 'X' y los '#' entre comillas dobles
-%				y los espacios vacíos se representan como variables anónimas (i.e. SIN COMILLAS).
-% esto es solo para testing, dado que el cliente del servidor convierte automáticamente al formato de consulta.
-
-% ejemplo: contarPintadas([["#","#","#"], ["X", _, _], [_, _, "#"]]).
-
-contarPintadas([], 0).
-
-contarPintadas([R | Rs], CantPintadas) :-
-	contarPintadasFila(R, CantPintadasFila),
-	contarPintadas(Rs, CantPintadasSubGrid),
-	CantPintadas is CantPintadasFila + CantPintadasSubGrid.
-
-contarPintadasFila([], 0).
-
-contarPintadasFila([C | Cs], CantPintadasFila) :-
-	C == "#",
-	contarPintadasFila(Cs, CantPintadasSubFila),
-	CantPintadasFila is CantPintadasSubFila + 1.
-
-contarPintadasFila([C | Cs], CantPintadasFila) :-
-	C \== "#",
-	contarPintadasFila(Cs, CantPintadasSubFila),
-	CantPintadasFila is CantPintadasSubFila.
-
-% Con lo que está arriba se pueden pedir múltiples soluciones con ";" pero SOLO ES VÁLIDA LA PRIMERA.
-% Si se usan los predicados de abajo, solo calcula UNA solución válida.
-
-/*	
-contarPintadasFila([C | Cs], CantPintadasFila) :-
-	C \= "#",
-	contarPintadasFila(Cs, CantPintadasSubFila),
-	CantPintadasFila is CantPintadasSubFila.
-
-contarPintadasFila([C | Cs], CantPintadasFila) :-
-	var(C),
-	contarPintadasFila(Cs, CantPintadasSubFila),
-	CantPintadasFila is CantPintadasSubFila.
-*/
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
