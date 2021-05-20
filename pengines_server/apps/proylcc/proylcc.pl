@@ -67,7 +67,7 @@ put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, Fil
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% check_pistas_columna(+Nro_col, +PistasCol, +Grilla).
+% check_pistas_columna(+Nro_col, +PistasCol, +Grilla, -ColSat).
 %
 % Asume 0 como posicion inicial de una lista.
 % ColSat devuelve 1 si la columna en la posicion Nro_col respeta las pistas, 0 caso contrario.
@@ -94,7 +94,7 @@ check_pistas_columna(Nro_col, PistasCol, Grilla, ColSat):-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% check_pistas_fila(+Nro_fil, +PistasFil, +Grilla).
+% check_pistas_fila(+Nro_fil, +PistasFil, +Grilla, -FilaSat).
 %
 % Asume 0 como posicion inicial de una lista.
 % FilaSat devuelve 1 si la fila en la posicion Nro_fil respeta las pistas, 0 caso contrario.
@@ -228,7 +228,7 @@ obtener_columna(Nro_col, [H|Grillita], [E|Columnita]):-
 %
 % obtener_fila(Nro_fil, Grilla, -FilaRes).
 %
-% Devuelve una lista con los elementos de la columna que indica Nro_fil.
+% Devuelve una lista con los elementos de la fila que indica Nro_fil.
 %
 /* ej.
 
