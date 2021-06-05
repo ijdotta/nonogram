@@ -20,6 +20,7 @@ class Game extends React.Component {
       rowClues: null,
       colClues: null,
       solvedGrid: null,
+      savedGrid: null,
       checkedRowClues: null,
       checkedColClues: null,
       waiting: false,
@@ -129,7 +130,7 @@ class Game extends React.Component {
 
       this.setState({waiting: true})
 
-      unveilCell(i, j);
+      this.unveilCell(i, j);
 
       this.setState({waiting: false})
 
@@ -173,6 +174,11 @@ class Game extends React.Component {
     });
   }
 
+  /**
+   * Revela el contenido correcto de la celda (i,j) y actualiza el estado de las pistas
+   * @param {*} i 
+   * @param {*} j 
+   */
   unveilCell(i, j) {
     const newGrid = this.currentGrid.slice();
     newGrid[i][j] = this.state.solvedGrid[i][j];
@@ -181,12 +187,48 @@ class Game extends React.Component {
     const checkCell = () => {
       this.checkRow(i);
       this.checkCol(j);
+      this.checkAll();
     }
 
     this.setState(
       {grid: newGrid},
       checkCell
     )
+  }
+
+  /**
+   * Muestra la solución del juego
+   */
+  showSolution() {
+    const nSavedGrid = this.state.grid.slice();
+    this.setState({savedGrid: nSavedGrid});
+
+    const solvedGrid = this.state.solvedGrid;
+    /*
+    const rowLength = solvedGrid.length;
+    const colLength = solvedGrid[0].length;
+    var solutionGrid = Array(rowLength).fill().map(() => Array(colLength).fill());
+    */
+    var solutionGrid = this.state.grid.slice(); //Buscar alternativa para declarar una matrix empty en vez de copiar la vieja
+
+    for (let i = 0; i < solvedGrid.length; i++) {
+      for (let j = 0; j < solvedGrid[i].length; j++) {
+        solutionGrid[i][j] = solvedGrid[i][j];
+      }
+    }
+
+    this.setState({grid: solutionGrid});
+  }
+
+  /**
+   * Reestablece la grilla de juego para dejar de mostrar la solución
+   */
+  restoreGameGrid() {
+    const gameGrid = this.state.savedGrid.slice();
+    this.setState({
+      grid: gameGrid,
+      savedGrid: null
+    })
   }
 
   setPaintingState(){
