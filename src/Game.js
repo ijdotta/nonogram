@@ -2,7 +2,7 @@ import React from 'react';
 import PengineClient from './PengineClient';
 import Board from './Board';
 import ModeSelector from './ModeSelector';
-import LevelUpdater from './LevelUpdate';
+import CustomButton from './CustomButton';
 
 class Game extends React.Component {
 
@@ -259,7 +259,8 @@ class Game extends React.Component {
             </div>
 
             <div className={"nextLevelBtnContainer" + hide}>
-              <LevelUpdater
+              <CustomButton
+                className={"nextLevelBtn"}
                 onClick={() => this.nextLevel()}
                 content={'>>'}
               />
