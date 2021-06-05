@@ -18,6 +18,7 @@ class Game extends React.Component {
       grid: null,
       rowClues: null,
       colClues: null,
+      solvedGrid: null,
       checkedRowClues: null,
       checkedColClues: null,
       waiting: false,
@@ -82,13 +83,32 @@ class Game extends React.Component {
         level: (nLevel + 1),
         endGame: false
       },
-      this.initialGridCheck //Callback function (espera al setState para no chequear sobre el tablero anterior)
+      this.getSolution
+      //this.initialGridCheck //Callback function (espera al setState para no chequear sobre el tablero anterior)
     );
 
     this.setState({
       waiting: false
     });
 
+  }
+
+  getSolution() {
+    const rClues = JSON.stringify(this.state.rowClues).replaceAll('"_"', "_"); // Remove quotes for variables.
+    const cClues = JSON.stringify(this.state.colClues).replaceAll('"_"', "_"); // Remove quotes for variables.
+    
+    const querySolve = 'solve(' + rClues + ', ' + cClues + ', SolvedGrid)';
+
+    this.pengine.query(querySolve, (success, response) => {
+      if (success) {
+        this.setState(
+          {
+            solvedGrid: response['SolvedGrid']
+          },
+          this.initialGridCheck
+        )
+      }
+    });
   }
 
   handleClick(i, j) {
@@ -170,6 +190,27 @@ class Game extends React.Component {
 
     this.setState({waiting: true});
 
+    //new
+
+    const currentGrid = this.state.grid;
+    const solvedGrid = this.state.solvedGrid;
+    var satisfied = true;
+
+    for (var i = 0; i < currentGrid.length && satisfied; i++) {
+      for (var j = 0; j < currentGrid[i].length && satisfied; j++) {
+        satisfied = solvedGrid[i][j] === "#"? currentGrid[i][j] === "#" : currentGrid[i][j] !== "#";
+      }
+    }
+
+    if (satisfied) {
+      this.setState({endGame: true});
+    }
+    
+    this.setState({waiting: false});
+
+    //endnew
+
+    /*
     const squaresS = JSON.stringify(this.state.grid).replaceAll('"_"', "_"); // Remove quotes for variables.
     const cClues = JSON.stringify(this.state.colClues);
     const rClues = JSON.stringify(this.state.rowClues);
@@ -183,7 +224,9 @@ class Game extends React.Component {
       }
 
       this.setState({waiting: false});
-    });
+    }
+    */
+
   }
 
   checkRow(i) {
