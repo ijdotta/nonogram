@@ -13,6 +13,7 @@ class Game extends React.Component {
     this.state = {
       mode: "#",
       unveilCellMode: false,
+      showingSolution: false,
       levels: null,
       level: 0,
       maxLevelIndex: 0,
@@ -334,6 +335,31 @@ class Game extends React.Component {
     console.log("CheckedColClues: " + this.state.checkedColClues);
   }
 
+  showHideSolution() {
+    this.setState({waiting: true});
+
+    const showingSolutionState = this.state.showingSolution;
+
+    if (showingSolutionState) {
+      this.restoreGameGrid();
+    }
+    else {
+      this.showSolution();
+    }
+
+    this.setState({
+      waiting: false,
+      showingSolution: !showingSolutionState
+    })
+  }
+
+  toggleUnveilCellMode() {
+    const unveilCellMode = this.state.unveilCellMode;
+    this.setState({
+      unveilCellMode: !unveilCellMode
+    })
+  }
+
   render() {
 
     var gameStatus = "¡Sigue jugando!";
@@ -368,6 +394,12 @@ class Game extends React.Component {
 
           <div className="buttons">
 
+            <CustomButton
+              className={"showHideSolutionBtn modeBox"}
+              content={"[#]"}
+              onClick={() => this.showHideSolution()}
+            />
+
             <div className="modeSelect">
               <ModeSelector
                 mode = {this.state.mode}
@@ -376,14 +408,22 @@ class Game extends React.Component {
               />
             </div>
 
-            <div className={"nextLevelBtnContainer" + hide}>
+            <CustomButton
+              className={"unveilCellBtn modeBox"}
+              content={"?"}
+              onClick={(i,j) => this.toggleUnveilCellMode()}
+            />
+
+            
+
+          </div>
+
+          <div className={"nextLevelBtnContainer" + hide}>
               <CustomButton
                 className={"nextLevelBtn"}
                 onClick={() => this.nextLevel()}
                 content={'>>'}
               />
-            </div>
-
           </div>
         
       </div>
