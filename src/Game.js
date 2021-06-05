@@ -266,8 +266,27 @@ class Game extends React.Component {
 
     this.setState({waiting: true});
 
+    const checkedRowClues = this.state.checkedRowClues;
+    const checkedColClues = this.state.checkedColClues;
+
+    var checked = true;
+
+    for (let i = 0; i < checkedRowClues.length && checked; i++) {
+      checked = checkedRowClues[i];
+    }
+
+    for (let i = 0; i < checkedColClues.length && checked; i++) {
+      checked = checkedColClues[i];
+    }
+    
+    this.setState({
+      endGame: checked,
+      waiting: false
+    })
+    
     //new
 
+    /*
     const currentGrid = this.state.grid;
     const solvedGrid = this.state.solvedGrid;
     var satisfied = true;
@@ -283,7 +302,7 @@ class Game extends React.Component {
     }
 
     this.setState({waiting: false});
-
+    */
     //endnew
 
     /*
