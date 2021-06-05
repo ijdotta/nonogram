@@ -12,6 +12,7 @@ class Game extends React.Component {
     super(props);
     this.state = {
       mode: "#",
+      unveilCellMode: false,
       levels: null,
       level: 0,
       maxLevelIndex: 0,
@@ -48,6 +49,9 @@ class Game extends React.Component {
     });
   }
 
+  /**
+   * Avanza al siguiente nivel disponible o finaliza el juego.
+   */
   nextLevel() {
 
     if (!this.state.endGame){
@@ -93,6 +97,9 @@ class Game extends React.Component {
 
   }
 
+  /**
+   * Recupera la solución para las pistas del nivel actual.
+   */
   getSolution() {
     const rClues = JSON.stringify(this.state.rowClues).replaceAll('"_"', "_"); // Remove quotes for variables.
     const cClues = JSON.stringify(this.state.colClues).replaceAll('"_"', "_"); // Remove quotes for variables.
@@ -116,6 +123,16 @@ class Game extends React.Component {
     console.log("EndGame: " + this.state.endGame);
 
     if (this.state.waiting || this.state.endGame) {
+      return;
+    }
+    else if (this.state.unveilCellMode) {
+
+      this.setState({waiting: true})
+
+      unveilCell(i, j);
+
+      this.setState({waiting: false})
+
       return;
     }
 
@@ -154,6 +171,22 @@ class Game extends React.Component {
     this.setState({          
       waiting: false
     });
+  }
+
+  unveilCell(i, j) {
+    const newGrid = this.currentGrid.slice();
+    newGrid[i][j] = this.state.solvedGrid[i][j];
+
+    // callback function para check new cell
+    const checkCell = () => {
+      this.checkRow(i);
+      this.checkCol(j);
+    }
+
+    this.setState(
+      {grid: newGrid},
+      checkCell
+    )
   }
 
   setPaintingState(){
@@ -205,7 +238,7 @@ class Game extends React.Component {
     if (satisfied) {
       this.setState({endGame: true});
     }
-    
+
     this.setState({waiting: false});
 
     //endnew
