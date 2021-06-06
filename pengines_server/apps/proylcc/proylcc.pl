@@ -420,3 +420,55 @@ contar_elementos([],0).
 contar_elementos([_H|T], Cant_elem):-
     contar_elementos(T, Cant_elem_aux),
     Cant_elem is Cant_elem_aux + 1.
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% generar(+Pistas, +Longitud, -Solucion).
+%
+% Devuelve una o varias soluciones de una linea segun sus Pistas
+%
+
+% No hay pistas y la Lista alcanzo la longitud maxima
+% devuelvo una lista vacia
+generar([], 0, []):- !.
+% No hay pistas y la Lista no alcanzo la longitud maxima
+% relleno con cruces.
+generar([], Longitud, Lista):-
+    subRelleno("X", Longitud, Lista),!.
+
+% Hay solo 1 pista, junto lo generado en el ultimo paso con una secuencia pintada sin separar
+%(ya se que en la recursividad me duelve una lista vacia o
+% lo que faltaba para rellenar con cruces).
+generar([Pista], Longitud, Lista):-
+    Pista =< Longitud,
+    Longitud_aux is Longitud - Pista,
+    generar([], Longitud_aux, Listita),    
+    subRelleno("#", Pista, Pintado),
+    append(Pintado,Listita,Lista).
+
+% Hay multiples pistas, junto la nueva secuencia pintada con la sub-lista de
+% la recursion, las separo con una Cruz.
+generar([Pista|Pistitas], Longitud, Lista):-
+    Pistitas \= [], % esto es para que en el backtracking no intente resolver dos veces lo mismo en el caso de que haya 1 pista.
+    Pista + 1 =< Longitud,
+    Longitud_aux is Longitud - (Pista+1),
+    generar(Pistitas, Longitud_aux, Listita),    
+    subRelleno("#", Pista, Pintado),
+    append(Pintado,["X"|Listita],Lista).
+
+% Hay pistas, agrego una Cruz al principio de cualquier sub-lista generada
+% es esencial para generar las distintas variantes.
+generar(Pistas, Longitud, ["X"|Listita]):-
+    Longitud \= 0,
+    Longitud_aux is Longitud - 1,
+    generar(Pistas, Longitud_aux, Listita).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% subRelleno(+Simbolo, +Cantidad, -Lista)
+%
+% Crea una lista llena de un simbolo de una longitud determinada.
+%
+subRelleno(_Simbolo, 0, []).
+subRelleno(Simbolo, Longitud, [Simbolo|SubListita]):-
+    Longitud_aux is Longitud - 1,
+    subRelleno(Simbolo, Longitud_aux, SubListita),!.	
