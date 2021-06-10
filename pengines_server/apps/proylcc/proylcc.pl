@@ -472,3 +472,23 @@ subRelleno(_Simbolo, 0, []).
 subRelleno(Simbolo, Longitud, [Simbolo|SubListita]):-
     Longitud_aux is Longitud - 1,
     subRelleno(Simbolo, Longitud_aux, SubListita),!.	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% solve(+RowClues, +ColClues, -SolvedGrid)
+%
+% Calcula la grilla solución para las pistas dadas
+%
+solve([], _, _).
+
+solve([RC | RCs], ColClues, [R | Rs]) :-
+    length(ColClues, Width),
+	generar(RC, Width, R),
+	solve(RCs, ColClues, Rs).
+	%,
+	%check_todas_columnas(Width, ColClues, [R | Rs]).
+
+solveShell(RowClues, ColClues, SolvedGrid) :-
+	solve(RowClues, ColClues, SolvedGrid),
+	length(ColClues, Width),
+	check_todas_columnas(Width, ColClues, SolvedGrid).
