@@ -492,3 +492,33 @@ solveShell(RowClues, ColClues, SolvedGrid) :-
 	solve(RowClues, ColClues, SolvedGrid),
 	length(ColClues, Width),
 	check_todas_columnas(Width, ColClues, SolvedGrid).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% aAaaaaAAAAAAAAaa
+%
+% bBbbbbbbBBBBBbb
+%
+% Documentar el uso de reverse(eficiencia: no tengo que hacer append para insertar posibles lineas al final al generar una grila)
+%
+resolverGrilla(RowClues, ColClues, GrillaRes):-
+    length(RowClues, RLength),
+    length(ColClues, CLength),
+    RLength_aux is (RLength - 1),
+    CLength_aux is (CLength - 1),
+    reverse(RowClues,RowCluesInverted), % Invierto las pistas para que en generarGrilla/3 el nth0/3 tome la primer pista para generar lineas. 
+    generarGrilla(RowCluesInverted, CLength, RLength_aux, GrillaRes), %Generar 1 posible grilla
+    check_todas_columnas(CLength_aux, ColClues, GrillaRes). %Chequear que la grilla sea valida
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% cCcccccccCCCCCCCcc
+%
+% dDdddddddDDDDDDdd
+%    
+generarGrilla(_RowClues, _CLength, -1, []). % Ya genere todas las filas, empiezo armando desde vacio.
+generarGrilla(RowClues, CLength, RowIndex, [PosibleLinea|PosibleGrillita]):-
+    nth0(RowIndex, RowClues, Clues), % Busco las pistas para la linea RowIndex
+    generar(Clues, CLength, PosibleLinea), % Genero una posible solucion a la linea
+    RowIndex_aux is (RowIndex - 1),
+    generarGrilla(RowClues, CLength, RowIndex_aux, PosibleGrillita). % Buscar siguiente posible linea	
