@@ -25,7 +25,8 @@ class Game extends React.Component {
       checkedRowClues: null,
       checkedColClues: null,
       waiting: false,
-      endGame: true
+      endGame: true,
+      gameStatus: '¡Empieza a jugar!'
     };
     this.handleClick = this.handleClick.bind(this);
     this.handlePengineCreate = this.handlePengineCreate.bind(this);
@@ -69,6 +70,9 @@ class Game extends React.Component {
 
     console.log("MaxLevel / currentLevel :: " + this.state.maxLevelIndex + "/" + nLevel);
     if (nLevel > this.state.maxLevelIndex) {
+      this.setState({
+        gameStatus: "¡Has completado todos los niveles!"
+      })
       return;
     }
 
@@ -78,7 +82,6 @@ class Game extends React.Component {
      * Level data format:
      *  [rowClues, colClues, grid]
      */
-
     this.setState(
       {
         rowClues: levelData[0],
@@ -103,6 +106,12 @@ class Game extends React.Component {
    * Recupera la solución para las pistas del nivel actual.
    */
   getSolution() {
+
+    this.setState({
+      waiting: true,
+      gameStatus: "Calculando la solución..."
+    })
+
     const rClues = JSON.stringify(this.state.rowClues).replaceAll('"_"', "_"); // Remove quotes for variables.
     const cClues = JSON.stringify(this.state.colClues).replaceAll('"_"', "_"); // Remove quotes for variables.
     
@@ -112,7 +121,9 @@ class Game extends React.Component {
       if (success) {
         this.setState(
           {
-            solvedGrid: response['SolvedGrid']
+            solvedGrid: response['SolvedGrid'],
+            gameStatus: "¡Comienza a jugar!",
+            waiting: false
           },
           this.initialGridCheck
         )
@@ -171,7 +182,8 @@ class Game extends React.Component {
     });
 
     this.setState({          
-      waiting: false
+      waiting: false,
+      gameStatus: "¡Sigue jugando!"
     });
   }
 
@@ -181,6 +193,11 @@ class Game extends React.Component {
    * @param {*} j 
    */
   unveilCell(i, j) {
+
+    if (this.state.waiting) {
+      return;
+    }
+
     //const newGrid = this.state.grid.slice();
     const newGrid = this.state.grid.map((x) => x.map((y) => y));
     newGrid[i][j] = this.state.solvedGrid[i][j];
@@ -220,8 +237,6 @@ class Game extends React.Component {
    */
   showSolution() {
 
-    this.setState({waiting: true}); //disable interaction while showing solution
-
     // copia en profundidad de la matriz.
     const nSavedGrid = this.state.grid.map((x) => x.map((y) => y));
     // copia superficial de solved.
@@ -241,17 +256,22 @@ class Game extends React.Component {
 
     this.setState({
       grid: gameGrid,
-      savedGrid: null,
-      waiting: false  // enable interaction after restoring gameGrid
+      savedGrid: null
     });
   }
 
   setPaintingState(){
-    this.setState({mode: "#"});
+    this.setState({
+      mode: "#",
+      gameStatus: "¡Sigue jugando!"
+    });
   }
 
   setCrossingState(){
-    this.setState({mode: "X"});
+    this.setState({
+      mode: "X",
+      gameStatus: "¡Sigue jugando!"
+    });
   }
 
   /**
@@ -307,8 +327,17 @@ class Game extends React.Component {
 
     console.log("endGame? " + checked);
     
+    var msg;
+    if (checked) {
+      msg = this.state.level <= this.state.maxLevelIndex? "¡Avanza al siguiente nivel!" : "¡Has completado todos los niveles!";
+    }
+    else {
+      msg = this.state.gameStatus;
+    } 
+
     this.setState({
       endGame: checked,
+      gameStatus: msg,
       waiting: false
     })
 
@@ -344,7 +373,7 @@ class Game extends React.Component {
     for (let j = 0; j < currentGrid.length && checked; j++) {
       checked = solvedGrid[j][i] === "#"? currentGrid[j][i] === "#" : currentGrid[j][i] !== "#";
     }
-    
+
     console.log("CheckedColClues: " + this.state.checkedColClues);
     
     return checked;
@@ -355,9 +384,17 @@ class Game extends React.Component {
     const showingSolutionState = this.state.showingSolution;
     if (showingSolutionState) {
       this.restoreGameGrid();
+      this.setState({
+        waiting: false,  // enable interaction after restoring gameGrid
+        gameStatus: "Has vuelto al tablero de juego"
+      })
     }
     else {
       this.showSolution();
+      this.setState({
+        waiting: true, // disable interaction while showing solution
+        gameStatus: "Estás viendo la solución"
+      })
     }
 
     this.setState({
@@ -366,27 +403,32 @@ class Game extends React.Component {
   }
 
   toggleUnveilCellMode() {
+
+    if (this.state.waiting) {
+      return;
+    }
+
     const unveilCellMode = this.state.unveilCellMode;
+    var msg = unveilCellMode? "¡Sigue jugando!" : "¡Revelando celdas!";
+
     this.setState({
-      unveilCellMode: !unveilCellMode
+      unveilCellMode: !unveilCellMode,
+      gameStatus: msg
     })
   }
 
   render() {
 
-    var gameStatus = "¡Sigue jugando!";
+    const gameStatus = this.state.gameStatus;
     var hide = " hidden";
+
+    console.log("GAMESTATUS: " + gameStatus); 
 
     if (this.state.grid === null) {
       return null;
     }
-    else if (this.state.endGame) {
-      if (this.state.level <= this.state.maxLevelIndex) {
-        gameStatus = "Avanza al siguiente nivel";
-        hide = "";
-      } else {
-        gameStatus = "¡Has ganado!";
-      }
+    else if (this.state.endGame && this.state.level <= this.state.maxLevelIndex) {
+      hide = "";
     }
 
     return (
