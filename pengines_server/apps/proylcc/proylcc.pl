@@ -479,6 +479,7 @@ subRelleno(Simbolo, Longitud, [Simbolo|SubListita]):-
 %
 % Calcula la grilla solución para las pistas dadas
 %
+/*
 solve([], _, _).
 
 solve([RC | RCs], ColClues, [R | Rs]) :-
@@ -492,6 +493,10 @@ solveShell(RowClues, ColClues, SolvedGrid) :-
 	solve(RowClues, ColClues, SolvedGrid),
 	length(ColClues, Width),
 	check_todas_columnas(Width, ColClues, SolvedGrid).
+*/
+
+solve(RowClues, ColClues, SolvedGrid) :-
+	resolverGrilla(RowClues, ColClues, SolvedGrid).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
