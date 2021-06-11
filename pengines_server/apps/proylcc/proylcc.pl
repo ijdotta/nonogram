@@ -89,7 +89,7 @@ put(Contenido, [RowN, ColN], PistasFilas, PistasColumnas, Grilla, NewGrilla, Fil
 */
 check_pistas_columna(Nro_col, PistasCol, Grilla, ColSat):-
     obtener_columna(Nro_col, Grilla, ColumnaRes),
-    obtener_pistas(Nro_col, PistasCol, PistasRes),
+    nth0(Nro_col, PistasCol, PistasRes), % obtener pistas
     check_pistas(PistasRes, ColumnaRes, ColSat).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -115,8 +115,8 @@ check_pistas_columna(Nro_col, PistasCol, Grilla, ColSat):-
  FilaSat = 1.
 */
 check_pistas_fila(Nro_fil, PistasFil, Grilla, FilaSat):-
-    obtener_fila(Nro_fil, Grilla, FilaRes),
-    obtener_pistas(Nro_fil, PistasFil, PistasRes),
+    nth0(Nro_fil, Grilla, FilaRes), % obtener fila
+    nth0(Nro_fil, PistasFil, PistasRes), % obtener pistas
     check_pistas(PistasRes, FilaRes, FilaSat).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -138,13 +138,13 @@ check_pistas_fila(Nro_fil, PistasFil, Grilla, FilaSat):-
 
 false.					   
 */
-check_todo(PistasFil, PistasCol, Grilla):-
-    contar_filas(Grilla, Cant_fil),
+check_todo(PistasFil, PistasCol, [H|Grilla]):- % Tomo la primer fila de la grilla para despues saber la cantidad de columnas.
+    length([H|Grilla], Cant_fil),
     Cant_fil_aux is Cant_fil - 1,
-    check_todas_filas(Cant_fil_aux, PistasFil, Grilla),
-    contar_columnas(Grilla, Cant_col),
+    check_todas_filas(Cant_fil_aux, PistasFil, [H|Grilla]),
+    length(H, Cant_col),
     Cant_col_aux is Cant_col - 1,
-    check_todas_columnas(Cant_col_aux, PistasCol, Grilla).
+    check_todas_columnas(Cant_col_aux, PistasCol, [H|Grilla]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -221,69 +221,8 @@ ColumnaRes = ["#", "#", "#", "#", "#"].
 */
 obtener_columna(_Nro_col, [], []).
 obtener_columna(Nro_col, [H|Grillita], [E|Columnita]):-
-    buscar_pos(Nro_col,H,E),
+    nth0(Nro_col,H,E), % obtener elemento de la columna
     obtener_columna(Nro_col, Grillita, Columnita).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% obtener_fila(Nro_fil, Grilla, -FilaRes).
-%
-% Devuelve una lista con los elementos de la fila que indica Nro_fil.
-%
-/* ej.
-
-?- obtener_fila( 		   0,							% Nro_fil
-						   [["#","#","#","#","#"], 		
-							["#", _ , _ , _ , _ ],
-							["#", _ , _ , _ , _ ],		% Grilla
-							["#", _ , _ , _ , _ ],
-							["#", _ , _ , _ , _ ]],
-
-							FilaRes).
-
-FilaRes = ["#", "#", "#", "#", "#"].
-*/
-obtener_fila(Nro_fil, Grilla, FilaRes):- buscar_pos(Nro_fil, Grilla, FilaRes).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% obtener_pistas(+Pos, +PistasFull, -PistasRes).
-%
-% Asume 0 como posicion inicial.
-% Devuelve la lista de pistas en la posicion Pos.
-% PistasFull puede ser PistasCol o PistasFil.
-%
-/* ej.
-
-?- obtener_pistas( 		1,													% Pos
-						[[1], [2,2], [3,3,3], [4,4,4,4], [5,5,5,5,5]], 		% PistasCol o PistasFil
-
-						PistasRes).
-
-PistasRes = [2, 2].
-*/
-obtener_pistas(Pos, PistasFull, PistasRes):- buscar_pos(Pos, PistasFull, PistasRes).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% buscar_pos(+Pos, +Lista, -ElementoRes).
-%
-% Asume 0 como posicion inicial.
-% Devuelve el elemento en la posicion Pos de la Lista.
-%
-/* ej.
-
-?- obtener_pistas( 		1,					% Pos
-						[a,b,c,d,e], 		% Lista
-
-						ElementoRes).
-
-ElementoRes = b.
-*/
-buscar_pos(0,[H|_T],H).
-buscar_pos(Pos, [_H|T], ElementoRes):-
-    PosAux is Pos - 1,
-    buscar_pos(PosAux,T, ElementoRes).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -364,63 +303,34 @@ check_pistas_aux([H|_Listita], 0):- 	% Si hay una celda pintada, devolver 0.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% contar_filas(+Grilla, -Cant_fil).
+% aAaaaaAAAAAAAAaa
 %
-% Devuelve la cantidad de filas que tiene la grilla.
+% bBbbbbbbBBBBBbb
 %
-/* ej.
-
-?- contar_filas(   [["#","#","#","#","#"], 		
-					["#", _ , _ , _ , _ ],
-					["#", _ , _ , _ , _ ],		% Grilla
-					["#", _ , _ , _ , _ ],
-					["#", _ , _ , _ , _ ]],
-
-					Cant_fil).
-
-Cant_fil = 5.
-*/
-contar_filas(Grilla, Cant_fil):- contar_elementos(Grilla, Cant_fil).
-
+% Documentar el uso de reverse(eficiencia: no tengo que hacer append para insertar posibles lineas al final al generar una grila)
+%
+resolverGrilla(RowClues, ColClues, GrillaRes):-
+    length(RowClues, RLength),
+    length(ColClues, CLength),
+    RLength_aux is (RLength - 1),
+    CLength_aux is (CLength - 1),
+    reverse(RowClues,RowCluesInverted), % Invierto las pistas para que en generarGrilla/3 el nth0/3 tome la primer pista para generar lineas. 
+    generarGrilla(RowCluesInverted, CLength, RLength_aux, GrillaRes), %Generar 1 posible grilla
+    check_todas_columnas(CLength_aux, ColClues, GrillaRes). %Chequear que la grilla sea valida
+    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% contar_columnas(+Grilla, -Cant_col).
+% cCcccccccCCCCCCCcc
 %
-% Devuelve la cantidad de columnas que tiene la grilla.
-%
-/* ej.
+% dDdddddddDDDDDDdd
+%    
+generarGrilla(_RowClues, _CLength, -1, []). % Ya genere todas las filas, empiezo armando desde vacio.
+generarGrilla(RowClues, CLength, RowIndex, [PosibleLinea|PosibleGrillita]):-
+    nth0(RowIndex, RowClues, Clues), % Busco las pistas para la linea RowIndex
+    generar(Clues, CLength, PosibleLinea), % Genero una posible solucion a la linea
+    RowIndex_aux is (RowIndex - 1),
+    generarGrilla(RowClues, CLength, RowIndex_aux, PosibleGrillita). % Buscar siguiente posible linea
 
-?- contar_columnas(    [["#","#","#","#","#"], 		
-						["#", _ , _ , _ , _ ],
-						["#", _ , _ , _ , _ ],		% Grilla
-						["#", _ , _ , _ , _ ],
-						["#", _ , _ , _ , _ ]],
-
-						Cant_col).
-
-Cant_col = 5.
-*/    
-contar_columnas([H|_Grillita], Cant_col):- contar_elementos(H, Cant_col).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% contar_elementos(+Lista, -Cant_elem).
-%
-% Devuelve la cantidad de elementos en la Lista.
-%
-/* ej.
-
-?- contar_elementos(    [a,b,c,d,e], % Lista
-
-						Cant_elem).
-
-Cant_elem = 5.
-*/  
-contar_elementos([],0).
-contar_elementos([_H|T], Cant_elem):-
-    contar_elementos(T, Cant_elem_aux),
-    Cant_elem is Cant_elem_aux + 1.
-	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % generar(+Pistas, +Longitud, -Solucion).
@@ -462,6 +372,7 @@ generar(Pistas, Longitud, ["X"|Listita]):-
     Longitud \= 0,
     Longitud_aux is Longitud - 1,
     generar(Pistas, Longitud_aux, Listita).
+	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % subRelleno(+Simbolo, +Cantidad, -Lista)
@@ -471,54 +382,4 @@ generar(Pistas, Longitud, ["X"|Listita]):-
 subRelleno(_Simbolo, 0, []).
 subRelleno(Simbolo, Longitud, [Simbolo|SubListita]):-
     Longitud_aux is Longitud - 1,
-    subRelleno(Simbolo, Longitud_aux, SubListita),!.	
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% solve(+RowClues, +ColClues, -SolvedGrid)
-%
-% Calcula la grilla solución para las pistas dadas
-%
-solve([], _, _).
-
-solve([RC | RCs], ColClues, [R | Rs]) :-
-    length(ColClues, Width),
-	generar(RC, Width, R),
-	solve(RCs, ColClues, Rs).
-	%,
-	%check_todas_columnas(Width, ColClues, [R | Rs]).
-
-solveShell(RowClues, ColClues, SolvedGrid) :-
-	solve(RowClues, ColClues, SolvedGrid),
-	length(ColClues, Width),
-	check_todas_columnas(Width, ColClues, SolvedGrid).
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% aAaaaaAAAAAAAAaa
-%
-% bBbbbbbbBBBBBbb
-%
-% Documentar el uso de reverse(eficiencia: no tengo que hacer append para insertar posibles lineas al final al generar una grila)
-%
-resolverGrilla(RowClues, ColClues, GrillaRes):-
-    length(RowClues, RLength),
-    length(ColClues, CLength),
-    RLength_aux is (RLength - 1),
-    CLength_aux is (CLength - 1),
-    reverse(RowClues,RowCluesInverted), % Invierto las pistas para que en generarGrilla/3 el nth0/3 tome la primer pista para generar lineas. 
-    generarGrilla(RowCluesInverted, CLength, RLength_aux, GrillaRes), %Generar 1 posible grilla
-    check_todas_columnas(CLength_aux, ColClues, GrillaRes). %Chequear que la grilla sea valida
-    
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% cCcccccccCCCCCCCcc
-%
-% dDdddddddDDDDDDdd
-%    
-generarGrilla(_RowClues, _CLength, -1, []). % Ya genere todas las filas, empiezo armando desde vacio.
-generarGrilla(RowClues, CLength, RowIndex, [PosibleLinea|PosibleGrillita]):-
-    nth0(RowIndex, RowClues, Clues), % Busco las pistas para la linea RowIndex
-    generar(Clues, CLength, PosibleLinea), % Genero una posible solucion a la linea
-    RowIndex_aux is (RowIndex - 1),
-    generarGrilla(RowClues, CLength, RowIndex_aux, PosibleGrillita). % Buscar siguiente posible linea	
+    subRelleno(Simbolo, Longitud_aux, SubListita),!.		
