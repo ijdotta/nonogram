@@ -181,11 +181,19 @@ class Game extends React.Component {
    * @param {*} j 
    */
   unveilCell(i, j) {
-    const newGrid = this.currentGrid.slice();
+    //const newGrid = this.state.grid.slice();
+    const newGrid = this.state.grid.map((x) => x.map((y) => y));
     newGrid[i][j] = this.state.solvedGrid[i][j];
 
     // callback function para check new cell
     const checkCell = () => {
+
+      console.log("Current grid before check: ");
+      for (let i = 0; i < this.state.grid.length; i++) {
+        const element = this.state.grid[i];
+        console.log(element + " ; ")
+      }
+
       this.checkRow(i);
       this.checkCol(j);
       this.checkAll();
@@ -202,67 +210,30 @@ class Game extends React.Component {
    */
   showSolution() {
 
-    console.log("Mi matriz: " + this.state.grid);
-    for (let i = 0; i < this.state.grid.length; i++) {
-      const element = this.state.grid[i];
-      console.log("Elem["+i+"]"+element);
-    }
+    this.setState({waiting: true}); //disable interaction while showing solution
 
+    // copia en profundidad de la matriz.
     const nSavedGrid = this.state.grid.map((x) => x.map((y) => y));
+    // copia superficial de solved.
+    const solvedGrid = this.state.solvedGrid.slice();
 
-    //const nSavedGrid = this.state.grid.slice();
-    //this.setState({savedGrid: nSavedGrid}, theFunction);     // ver usar callback function! || re: (no es por ahí...)
-
-    /*
-      Si el grid es un arreglo de arreglos, el problema es que slice devuelve un arreglo
-      cuyas componentes son copias de las referencias del viejo arreglo.
-      Debe añadirse un nivel de copiado para que esto no pase.
-    */
-
-
-    const theFunction = () => {
-
-    console.log("Saving grid: " + nSavedGrid);
-    console.log("saved ok? = " + this.state.savedGrid); // acá estaba bien
-
-    const solvedGrid = this.state.solvedGrid;
-
-    console.log("solved: " + solvedGrid);
-    /*
-    const rowLength = solvedGrid.length;
-    const colLength = solvedGrid[0].length;
-    var solutionGrid = Array(rowLength).fill().map(() => Array(colLength).fill());
-    */
-    var solutionGrid = this.state.grid.slice(); //Buscar alternativa para declarar una matrix empty en vez de copiar la vieja
-
-    for (let i = 0; i < solvedGrid.length; i++) {
-      for (let j = 0; j < solvedGrid[i].length; j++) {
-        solutionGrid[i][j] = solvedGrid[i][j];
-      }
-    }
-
-    this.setState({grid: solutionGrid});
-    
-    console.log("saved ok???? = " + this.state.savedGrid); // acá se rompe
-  }
-
-  this.setState({savedGrid: nSavedGrid}, theFunction);     // ver usar callback function! || re: (no es por ahí...)
-
+    this.setState({
+      grid: solvedGrid,
+      savedGrid: nSavedGrid
+    });
   }
 
   /**
    * Reestablece la grilla de juego para dejar de mostrar la solución
    */
   restoreGameGrid() {
-    console.log("Restoring grid... ");
     const gameGrid = this.state.savedGrid.slice();
-
-    console.log("saved grid: " + gameGrid);
 
     this.setState({
       grid: gameGrid,
-      savedGrid: null
-    })
+      savedGrid: null,
+      waiting: false  // enable interaction after restoring gameGrid
+    });
   }
 
   setPaintingState(){
@@ -311,6 +282,8 @@ class Game extends React.Component {
     for (let i = 0; i < checkedColClues.length && checked; i++) {
       checked = checkedColClues[i];
     }
+
+    console.log("endGame? " + checked);
     
     this.setState({
       endGame: checked,
@@ -357,7 +330,26 @@ class Game extends React.Component {
 
   }
 
+  /*
+      Grid = array of rows
+  */
+
   checkRow(i) {
+
+    const currentGrid = this.state.grid.slice();
+    const solvedGrid = this.state.solvedGrid.slice();
+    const newCheckedRowClues = this.state.checkedRowClues.slice();
+
+    var checked = true;
+
+    for (let j = 0; j < currentGrid[i].length && checked; j++) {
+      checked = solvedGrid[i][j] === "#"? currentGrid[i][j] === "#" : currentGrid[i][j] !== "#";
+    }
+    newCheckedRowClues[i] = checked;
+
+    this.setState({checkedRowClues: newCheckedRowClues});
+
+    /*
     const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_");
     const rClues = JSON.stringify(this.state.rowClues);
     const queryCheckFila = 'check_pistas_fila('+i+','+ rClues +','+ nGrilla + ', FilaSat)';
@@ -368,11 +360,25 @@ class Game extends React.Component {
       newCheckedRowClues[i] = response['FilaSat'] === 1;
       this.setState({checkedRowClues: newCheckedRowClues});
     });
+    */
 
     console.log("CheckedRowClues: " + this.state.checkedRowClues);
   }
 
   checkCol(i) {
+
+    const currentGrid = this.state.grid.slice();
+    const solvedGrid = this.state.solvedGrid.slice();
+    const newCheckedColClues = this.state.checkedColClues.slice();
+
+    var checked = true;
+    
+    for (let j = 0; j < currentGrid.length && checked; j++) {
+      checked = solvedGrid[j][i] === "#"? currentGrid[j][i] === "#" : currentGrid[j][i] !== "#";
+    }
+    newCheckedColClues[i] = checked;
+
+    /*
     const nGrilla = JSON.stringify(this.state.grid).replaceAll('"_"', "_");
     const cClues = JSON.stringify(this.state.colClues);
     const queryCheckColumna = 'check_pistas_columna('+i+','+ cClues +','+ nGrilla + ', ColSat)';
@@ -383,17 +389,15 @@ class Game extends React.Component {
       newCheckedColClues[i] = response['ColSat'] === 1;
       this.setState({checkedColClues: newCheckedColClues});
     });
-    
+    */
+    this.setState({checkedColClues: newCheckedColClues});
     console.log("CheckedColClues: " + this.state.checkedColClues);
+    
   }
 
   showHideSolution() {
-    this.setState({waiting: true});
 
     const showingSolutionState = this.state.showingSolution;
-
-    console.log("toggle solution: " + showingSolutionState);
-
     if (showingSolutionState) {
       this.restoreGameGrid();
     }
@@ -402,9 +406,8 @@ class Game extends React.Component {
     }
 
     this.setState({
-      waiting: false,
       showingSolution: !showingSolutionState
-    })
+    });
   }
 
   toggleUnveilCellMode() {
