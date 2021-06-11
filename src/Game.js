@@ -201,10 +201,33 @@ class Game extends React.Component {
    * Muestra la solución del juego
    */
   showSolution() {
-    const nSavedGrid = this.state.grid.slice();
-    this.setState({savedGrid: nSavedGrid});
+
+    console.log("Mi matriz: " + this.state.grid);
+    for (let i = 0; i < this.state.grid.length; i++) {
+      const element = this.state.grid[i];
+      console.log("Elem["+i+"]"+element);
+    }
+
+    const nSavedGrid = this.state.grid.map((x) => x.map((y) => y));
+
+    //const nSavedGrid = this.state.grid.slice();
+    //this.setState({savedGrid: nSavedGrid}, theFunction);     // ver usar callback function! || re: (no es por ahí...)
+
+    /*
+      Si el grid es un arreglo de arreglos, el problema es que slice devuelve un arreglo
+      cuyas componentes son copias de las referencias del viejo arreglo.
+      Debe añadirse un nivel de copiado para que esto no pase.
+    */
+
+
+    const theFunction = () => {
+
+    console.log("Saving grid: " + nSavedGrid);
+    console.log("saved ok? = " + this.state.savedGrid); // acá estaba bien
 
     const solvedGrid = this.state.solvedGrid;
+
+    console.log("solved: " + solvedGrid);
     /*
     const rowLength = solvedGrid.length;
     const colLength = solvedGrid[0].length;
@@ -219,13 +242,23 @@ class Game extends React.Component {
     }
 
     this.setState({grid: solutionGrid});
+    
+    console.log("saved ok???? = " + this.state.savedGrid); // acá se rompe
+  }
+
+  this.setState({savedGrid: nSavedGrid}, theFunction);     // ver usar callback function! || re: (no es por ahí...)
+
   }
 
   /**
    * Reestablece la grilla de juego para dejar de mostrar la solución
    */
   restoreGameGrid() {
+    console.log("Restoring grid... ");
     const gameGrid = this.state.savedGrid.slice();
+
+    console.log("saved grid: " + gameGrid);
+
     this.setState({
       grid: gameGrid,
       savedGrid: null
@@ -358,6 +391,8 @@ class Game extends React.Component {
     this.setState({waiting: true});
 
     const showingSolutionState = this.state.showingSolution;
+
+    console.log("toggle solution: " + showingSolutionState);
 
     if (showingSolutionState) {
       this.restoreGameGrid();
