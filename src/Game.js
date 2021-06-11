@@ -62,7 +62,8 @@ class Game extends React.Component {
     }
 
     this.setState({
-      waiting: true
+      waiting: true,
+      solvedGrid: null
     });
 
 
@@ -90,6 +91,7 @@ class Game extends React.Component {
         checkedRowClues: Array(levelData[0].length).fill(false),
         checkedColClues: Array(levelData[1].length).fill(false),
         level: (nLevel + 1),
+        unveilCellMode: false,
         endGame: false
       },
       this.getSolution
@@ -260,7 +262,11 @@ class Game extends React.Component {
     });
   }
 
-  setPaintingState(){
+  setPaintingState() {
+    if (this.state.waiting) {
+      return;
+    }
+
     this.setState({
       mode: "#",
       gameStatus: "¡Sigue jugando!"
@@ -268,6 +274,10 @@ class Game extends React.Component {
   }
 
   setCrossingState(){
+    if (this.state.waiting) {
+      return;
+    }
+    
     this.setState({
       mode: "X",
       gameStatus: "¡Sigue jugando!"
@@ -380,6 +390,10 @@ class Game extends React.Component {
   }
 
   showHideSolution() {
+
+    if (this.state.solvedGrid === null) {
+      return;
+    }
 
     const showingSolutionState = this.state.showingSolution;
     if (showingSolutionState) {
