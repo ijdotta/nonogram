@@ -117,7 +117,7 @@ class Game extends React.Component {
     const rClues = JSON.stringify(this.state.rowClues).replaceAll('"_"', "_"); // Remove quotes for variables.
     const cClues = JSON.stringify(this.state.colClues).replaceAll('"_"', "_"); // Remove quotes for variables.
     
-    const querySolve = 'solve(' + rClues + ', ' + cClues + ', SolvedGrid)';
+    const querySolve = 'resolverGrilla(' + rClues + ', ' + cClues + ', SolvedGrid)';
 
     this.pengine.query(querySolve, (success, response) => {
       if (success) {
@@ -134,10 +134,10 @@ class Game extends React.Component {
   }
 
   handleClick(i, j) {
-
     console.log("EndGame: " + this.state.endGame);
 
     if (this.state.waiting || this.state.endGame) {
+
       return;
     }
     else if (this.state.unveilCellMode) {
@@ -199,7 +199,7 @@ class Game extends React.Component {
     if (this.state.waiting) {
       return;
     }
-
+    
     //const newGrid = this.state.grid.slice();
     const newGrid = this.state.grid.map((x) => x.map((y) => y));
     newGrid[i][j] = this.state.solvedGrid[i][j];
@@ -273,7 +273,7 @@ class Game extends React.Component {
     });
   }
 
-  setCrossingState(){
+    setCrossingState(){
     if (this.state.waiting) {
       return;
     }
@@ -482,7 +482,7 @@ class Game extends React.Component {
               className={"hintBtn unveilCellBtn modeBox"}
               content={"💡"}
               selected={(this.state.unveilCellMode)}
-              onClick={(i,j) => this.toggleUnveilCellMode()}
+              onClick={(i,j) => this.toggleUnveilCellMode()}b
             />
 
             
