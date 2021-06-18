@@ -434,6 +434,7 @@ class Game extends React.Component {
   render() {
 
     const gameStatus = this.state.gameStatus;
+    const waiting = this.state.waiting;
     var hide = " hidden";
 
     console.log("GAMESTATUS: " + gameStatus); 
@@ -463,8 +464,9 @@ class Game extends React.Component {
           <div className="buttons">
 
             <CustomButton
-              className={"showHideSolutionBtn modeBox"}
-              content={"[#]"}
+              className={"hintBtn showHideSolutionBtn modeBox"}
+              content={"▣"}
+              selected={(this.state.showingSolution === true)}
               onClick={() => this.showHideSolution()}
             />
 
@@ -477,8 +479,9 @@ class Game extends React.Component {
             </div>
 
             <CustomButton
-              className={"unveilCellBtn modeBox"}
-              content={"?"}
+              className={"hintBtn unveilCellBtn modeBox"}
+              content={"💡"}
+              selected={(this.state.unveilCellMode)}
               onClick={(i,j) => this.toggleUnveilCellMode()}
             />
 
@@ -490,7 +493,7 @@ class Game extends React.Component {
               <CustomButton
                 className={"nextLevelBtn"}
                 onClick={() => this.nextLevel()}
-                content={'>>'}
+                content={'⮕'}
               />
           </div>
         
