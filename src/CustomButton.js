@@ -1,12 +1,13 @@
 import React from "react";
 
-class LevelUpdater extends React.Component {
+class CustomButton extends React.Component {
     render() {
 
+        const selected = this.props.selected;
 
         return(
             <div>
-                <button className="nextLevelBtn"
+                <button className={this.props.className + (selected? " selected" : "")}
                     onClick={this.props.onClick}>
                     {this.props.content}
                 </button>
@@ -15,4 +16,4 @@ class LevelUpdater extends React.Component {
     }
 }
 
-export default LevelUpdater;
+export default CustomButton;
