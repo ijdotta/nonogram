@@ -196,7 +196,7 @@ class Game extends React.Component {
    */
   unveilCell(i, j) {
 
-    if (this.state.waiting) {
+    if (this.state.waiting || this.state.endGame) {
       return;
     }
     
@@ -263,7 +263,7 @@ class Game extends React.Component {
   }
 
   setPaintingState() {
-    if (this.state.waiting) {
+    if (this.state.waiting || this.state.endGame) {
       return;
     }
 
@@ -274,7 +274,7 @@ class Game extends React.Component {
   }
 
   setCrossingState() {
-    if (this.state.waiting) {
+    if (this.state.waiting || this.state.endGame) {
       return;
     }
     
@@ -391,7 +391,7 @@ class Game extends React.Component {
 
   showHideSolution() {
 
-    if (this.state.solvedGrid === null) {
+    if (this.state.solvedGrid === null || this.state.endGame) {
       return;
     }
 
@@ -418,7 +418,7 @@ class Game extends React.Component {
 
   toggleUnveilCellMode() {
 
-    if (this.state.waiting) {
+    if (this.state.waiting || this.state.endGame) {
       return;
     }
 
