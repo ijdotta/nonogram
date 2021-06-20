@@ -273,7 +273,7 @@ class Game extends React.Component {
     });
   }
 
-    setCrossingState(){
+  setCrossingState() {
     if (this.state.waiting) {
       return;
     }
@@ -465,7 +465,7 @@ class Game extends React.Component {
 
             <CustomButton
               className={"hintBtn showHideSolutionBtn modeBox"}
-              content={"▣"}
+              content={"🔮"}
               selected={(this.state.showingSolution === true)}
               onClick={() => this.showHideSolution()}
             />

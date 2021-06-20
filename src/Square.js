@@ -5,17 +5,20 @@ class Square extends React.Component {
 
         const value = this.props.value;
         var cell_state = "";
+        var icon;
         if (value === "#") {
             cell_state = " painted";
+            icon = "";
         }
         else if (value === "X") {
             cell_state = " crossed";
+            icon = "❌";
         }
 
         return (
             <button className={"square" + cell_state} 
                 onClick={this.props.onClick}>
-                {value !== '_' ? value : null}
+                {value !== '_' ? icon : null}
             </button>
         );
     }

@@ -5,14 +5,22 @@ class ModeBox extends React.Component {
 
         const selected = this.props.selected;
         const value = this.props.value;
+        var type, icon;
 
-        const type = value === "#"? "paint" : "cross";
+        if (value === "#") {
+            type = "paint";
+            icon = "⬛";
+        }
+        else {
+            type = "cross";
+            icon = "❌";
+        }
 
         return (
         
             <button className={"modeBox" + (selected? " selected" : "") + " " + type}
                 onClick={this.props.onClick}>
-                {value}
+                {icon}
             </button>
         );
     }
